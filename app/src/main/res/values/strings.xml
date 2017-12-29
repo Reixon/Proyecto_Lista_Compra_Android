@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Codigo de barras</string>
+    <string name="action_settings">Setting</string>
+    <string name="btnScan">Scan</string>
+    <string name="txtbtnQRcode">Lector de QR Code</string>
+    <string name="txtbtnBarcode">Lector de Código de Barra</string>
+    <string name="title_aplication">Codigo de Barras</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_stock_product">stock_product</string>
+    <string name="Aceptar">Aceptar</string>
+    <string name="title_activity_main_menu_activity">main_menu_activity</string>
+    <string name="action_share">Share</string>
+    <string name="title_activity_tab">tab</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
