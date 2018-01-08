@@ -29,7 +29,7 @@ public class activity_list_products_expanable extends AppCompatActivity {
         db = mysql.getWritableDatabase();
         ArrayList<Category> cate = mysql.loadCategorias(db);
         ArrayList<Category> groups = prepareData(allProd, cate);
-        final activity_categories_expanable adapter = new activity_categories_expanable(this, groups);
+        final Adapter_categories_expanable adapter = new Adapter_categories_expanable(this, groups);
         listView.setAdapter(adapter);
     }
 

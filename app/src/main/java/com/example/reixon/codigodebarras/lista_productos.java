@@ -1,9 +1,11 @@
 package com.example.reixon.codigodebarras;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,26 +30,32 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class lista_productos extends AppCompatActivity {
 
-    private AdapterListDespensa adapterListPro = null;
-    private ArrayList<String> listaProductosNombre, listaSuperNombre;
+    private AdapterListDespensa adapterListPro;
+    private ArrayList<String> listaSuperNombre;
     private ArrayList<SuperMerc>arraySupers;
     private ArrayList<Producto>productoTotal;
+    private ArrayList<Category>arrayCategories;
     private ListView listView = null;
     private boolean encuentra,filterOn;
-    private MenuItem delete, compartir; //searchItem
+    private MenuItem delete, checkAll; //searchItem
     private Button anyadirListBuy;
     private ImageButton bt_speak, btCode, btOk;
     private Spinner spinnerSupers;
     private SearchView sv;
     protected MySQL mysql;
     protected SQLiteDatabase db;
-    private boolean loadData;
+    private boolean loadData, menu_active;
     private static final int LOAD_DATA_MYSQL=100;
+    protected PowerManager.WakeLock wakelock;
 
     private EditText txt_edit;
 
@@ -64,6 +71,7 @@ public class lista_productos extends AppCompatActivity {
         btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
         btOk = (ImageButton)findViewById(R.id.bt_ok_menu_search);
 
+
         txt_edit.clearFocus();
         txt_edit.setSingleLine();
         txt_edit.setHorizontallyScrolling(true);
@@ -75,6 +83,13 @@ public class lista_productos extends AppCompatActivity {
         anyadirListBuy.setVisibility(View.GONE);
         spinnerSupers.setVisibility(View.GONE);
         loadData = false;
+        menu_active=false;
+
+        final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
+        this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
+        Toast.makeText(this, "La pantalla se mantendrá encendida hasta pasar de pantalla.", Toast.LENGTH_SHORT).show();
+        wakelock.acquire();
+
         bt_speak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +114,7 @@ public class lista_productos extends AppCompatActivity {
         if(b!=null) {
             arraySupers = (ArrayList<SuperMerc>) b.getSerializable("Lista Supers");
             productoTotal = (ArrayList<Producto>)b.getSerializable("Full Products");
+            arrayCategories =(ArrayList<Category>) b.getSerializable("Array Categories");
         }
 
         listaSuperNombre = new ArrayList<String>();
@@ -165,6 +181,29 @@ public class lista_productos extends AppCompatActivity {
             }
         });
 
+        anyadirListBuy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean [] checks = adapterListPro.getItemCheck();
+                for(int i = 0; i< checks.length; i++) {
+                    if(checks[i]) {
+                        db = mysql.getWritableDatabase();
+                        mysql.add_Producto_A_Lista_SuperMercado(db,
+                                arraySupers.get(spinnerSupers.getSelectedItemPosition()),
+                                productoTotal.get(i));
+                        arraySupers.get(
+                                spinnerSupers.getSelectedItemPosition()).
+                                addProduct(productoTotal.get(i));
+                        //addProductListSuper(searchList.get(ArrayCheck[i].getPosition()));
+                    }
+                }
+                setVisibleDelete(false);
+                adapterListPro.vaciarArrayCheck();
+
+                Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         txt_edit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -198,7 +237,28 @@ public class lista_productos extends AppCompatActivity {
             }
         });
 
+        adapterListPro = new AdapterListDespensa(this,
+                R.layout.stock_product_adapter, productoTotal);
 
+        listView = (ListView) findViewById(R.id.listaProductos);
+        listView.setAdapter(adapterListPro);
+
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int pos,
+                                    long id) {
+                Producto p = adapterListPro.getSearchList().get(pos);
+                Bundle b = new Bundle();
+
+                b.putSerializable("Producto", p);
+                b.putSerializable("Lista Supers",arraySupers);
+                Intent intentViewProduct= new Intent(lista_productos.this, ViewProduct.class);
+                intentViewProduct.putExtras(b);
+                startActivityForResult(intentViewProduct,LOAD_DATA_MYSQL);
+
+            }
+        });
 
     }
 
@@ -209,39 +269,6 @@ public class lista_productos extends AppCompatActivity {
         return productoTotal;
     }
 
-    public void setVisibleDelete(Boolean b){
-
-        delete.setVisible(b);
-    }
-
-    public void setVisibleSpinnersSupers(int n){
-        spinnerSupers.setVisibility(n);
-    }
-
-    public void setVisibleButtomAnyadir(int n){
-        anyadirListBuy.setVisibility(n);
-    }
-
-    public SuperMerc getSuperWithSpinnersPosition(int n){
-        return arraySupers.get(n);
-    }
-
-    public int getVisibilitySpinnerSupers(){
-        return this.spinnerSupers.getVisibility();
-    }
-
-    public int getVisibilityButtonAnyadir(){
-        return this.anyadirListBuy.getVisibility();
-    }
-
-    public int getSpinnersSupersSelectedPosition(){
-        return spinnerSupers.getSelectedItemPosition();
-    }
-
-    public void addProductListSuper(Producto prod){
-        arraySupers.get(spinnerSupers.getSelectedItemPosition()).addProduct(prod);
-    }
-
     public void insertarProducto(EditText txt){
         String nombre = txt.getText().toString();
         adapterListPro.anyadirProducto(nombre);
@@ -250,19 +277,35 @@ public class lista_productos extends AppCompatActivity {
         txt.setText("");
     }
 
+    public void deleteProductCheck(){
+        String nombres="";
+        boolean[] itemChecks = adapterListPro.getItemCheck();
+        for(int i=0; i<productoTotal.size(); i++){
+            if(itemChecks[i]==true) {
+                db = mysql.getWritableDatabase();
+                mysql.eliminarProducto(productoTotal.get(i).getId(), db);
+                nombres = nombres + "\n" + productoTotal.get(i).getNombre();
+            }
+        }
+        db = mysql.getReadableDatabase();
+        productoTotal = mysql.loadFullProduct(db);
 
-
+        Toast.makeText(this, nombres+" eliminado", Toast.LENGTH_SHORT).show();
+        this.setVisibleDelete(false);
+        adapterListPro.setList(productoTotal);
+    }
 
     public void onResume() {
         super.onResume();
-        Log.d("MyApp", "*** ON RESUME LISTA PRODUCTOS *** ");
         if(loadData){
             db = mysql.getWritableDatabase();
             productoTotal = mysql.loadFullProduct(db);
+            arraySupers = mysql.cargarSuperMercadosBD(db);
             loadData=false;
+            adapterListPro.setList(productoTotal);
         }
         txt_edit.clearFocus();
-        adapterView();
+
 
     }
 
@@ -328,35 +371,6 @@ public class lista_productos extends AppCompatActivity {
         }
     }
 
-    private void adapterView() {
-
-    //    Log.d("MyApp", " Adapter");
-        adapterListPro = new AdapterListDespensa(this,
-                R.layout.adapter_producto_stock, productoTotal);
-
-        listView = (ListView) findViewById(R.id.listaProductos);
-        listView.setAdapter(adapterListPro);
-        listView.setTextFilterEnabled(true);
-
-        listView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int pos,
-                                    long id) {
-                Producto p = adapterListPro.getSearchList().get(pos);
-                Bundle b = new Bundle();
-
-                b.putSerializable("Producto", p);
-                b.putSerializable("Lista Supers",arraySupers);
-                Intent intentViewProduct= new Intent(lista_productos.this, ViewProduct.class);
-                intentViewProduct.putExtras(b);
-                startActivityForResult(intentViewProduct,LOAD_DATA_MYSQL);
-
-                //startActivity(intentViewProduct);
-              //  finish();
-            }
-        });
-    }
 
     @Override
     protected void onStop() {
@@ -369,35 +383,46 @@ public class lista_productos extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.main_menu_activity, menu);
-        //searchItem = main_menu.findItem(R.id.search_list_products);
-       // compartir = main_menu.findItem(R.id.compartir);
-        //sv = (SearchView) MenuItemCompat.getActionView(searchItem);
-        //sv.setQueryHint("Buscar o Añadir Producto");
-
-     //   delete = menu.findItem(R.id.EtBorrar_producto);
-     //   delete.setVisible(false);
+        getMenuInflater().inflate(R.menu.main_menu_products, menu);
 
         return true;
+    }
+
+
+    public void setVisibleDelete(Boolean b){
+        if(b){
+            anyadirListBuy.setVisibility(View.VISIBLE);
+            spinnerSupers.setVisibility(View.VISIBLE);
+        }
+        else{
+            anyadirListBuy.setVisibility(View.GONE);
+            spinnerSupers.setVisibility(View.GONE);
+        }
+
+        menu_active=b;
+        invalidateOptionsMenu();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
+            case R.id.checkAll:
+                adapterListPro.setCheckAll();
+                break;
             case R.id.EtBorrar_producto:
                 DialogInterface.OnClickListener dialogClick = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                                adapterListPro.deleteProductCheck();
-                                listView.invalidate();
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                dialog.cancel();
-                                break;
-                        }
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            deleteProductCheck();
+                            listView.invalidate();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            dialog.cancel();
+                            break;
+                    }
                     }
                 };
                 AlertDialog.Builder dialog = new AlertDialog.Builder(lista_productos.this);
@@ -407,11 +432,90 @@ public class lista_productos extends AppCompatActivity {
             case R.id.action_settings:
                 Toast.makeText(lista_productos.this,"opciones",Toast.LENGTH_SHORT);
                 return true;
-            case R.id.share:
+            case R.id.share_products:
+                createFileJSON();
                 Toast.makeText(lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(menu_active){
+            menu.clear();
+            getMenuInflater().inflate(R.menu.main_menu_active, menu);
+            if(adapterListPro.getCheckAll()){
+                menu.getItem(1).setIcon(R.drawable.icon_check_off);
+            }
+            else{
+                menu.getItem(1).setIcon(R.drawable.icon_check_on);
+            }
+
+        }
+        else{
+            menu.clear();
+            getMenuInflater().inflate(R.menu.main_menu_products, menu);
+
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /*COMPARTIR*/
+    private void createFileJSON(){
+        JSONArray arrayProdJSON = convertArrayTOJSON();
+        Writer output = null;
+        try {
+        /*    File dirImg = new ContextWrapper(getApplicationContext()).getDir("Archivos", Context.MODE_APPEND);
+            File file = new File(dirImg, "listShare.json");
+            output = new BufferedWriter(new FileWriter(file));
+            output.write(superJSON.toString());
+            output.close();*/
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TITLE,"lista  productos JSON");
+            sendIntent.putExtra(Intent.EXTRA_TEXT, arrayProdJSON.toString());
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private JSONArray convertArrayTOJSON(){
+        JSONArray arrayProducts = new JSONArray();
+        JSONObject product;
+        JSONObject category;
+
+        try {
+            product = new JSONObject();
+            for(int i=0; i<this.productoTotal.size(); i++){
+                product.put("name", productoTotal.get(i).getNombre());
+                //int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int cantidad, int unidad
+                product.put("price", productoTotal.get(i).getPrecio());
+                product.put("image", productoTotal.get(i).getRutaImagen());
+                product.put("codigo", productoTotal.get(i).getCodigo());
+                for(int x =0; x<arrayCategories.size(); x++){
+                    if(arrayCategories.get(x).getId()== productoTotal.get(i).getCategoria()){
+                        category = new JSONObject();
+                        category.put("name", arrayCategories.get(x).getNombre());
+                        product.put("category", category);
+                    }
+                }
+                product.put("quantity", productoTotal.get(i).getCantidad());
+                product.put("unity",productoTotal.get(i).getUnidad());
+                arrayProducts.put(product);
+            }
+
+
+        }catch (org.json.JSONException e){
+
+        }
+        return arrayProducts;
+    }
+
 }

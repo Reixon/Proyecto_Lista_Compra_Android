@@ -58,7 +58,7 @@ public class lista_compra extends AppCompatActivity{
     private EditText txt_edit;
     private SQLiteDatabase db;
     private MySQL mysql;
-    private boolean loadData;
+    private boolean loadData, menu_active;;
     private static final int LOAD_DATA_MYSQL=100;
 
     @Override
@@ -81,6 +81,7 @@ public class lista_compra extends AppCompatActivity{
         txt_edit.setSingleLine();
         txt_edit.setHorizontallyScrolling(true);
         loadData=false;
+        menu_active=false;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_lista_compra);
         toolbar.setTitle("");
@@ -104,7 +105,7 @@ public class lista_compra extends AppCompatActivity{
 
 
         this.listaProductosCompra = sp.getProductos();
-        adapterListCom = new AdapterListBuyProd(this,R.layout.adapter_producto_stock,
+        adapterListCom = new AdapterListBuyProd(this,R.layout.stock_product_adapter,
                 listaProductosCompra);
         listView.setAdapter(adapterListCom);
 
@@ -427,21 +428,10 @@ public class lista_compra extends AppCompatActivity{
         wakelock.release();
     }
 
-    public MenuItem getDelete(){
-        return delete;
-    }
-
     public SuperMerc getSuperMerc(){
         return sp;
     }
 
-    public void setProductosTotales(ArrayList<Producto> p){
-        productoTotal = p;
-    }
-
-    public ArrayList<Producto> getProductosTotales(){
-        return productoTotal;
-    }
 
 
     public void deleteProductCheck(){
@@ -466,7 +456,7 @@ public class lista_compra extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-            getMenuInflater().inflate(R.menu.main_menu_activity, menu);
+            getMenuInflater().inflate(R.menu.main_menu_buy_list, menu);
             //searchItem = main_menu.findItem(R.id.search_list_products);
             //compartir = main_menu.findItem(R.id.compartir);
 
@@ -512,20 +502,51 @@ public class lista_compra extends AppCompatActivity{
         return true;
     }
 
+    public void setVisibleDelete(Boolean b){
+        menu_active=b;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(menu_active){
+            menu.clear();
+            getMenuInflater().inflate(R.menu.main_menu_active, menu);
+        }
+        else{
+            menu.clear();
+            getMenuInflater().inflate(R.menu.main_menu_buy_list, menu);
+
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case R.id.checkAll:
+                adapterListCom.setCheckAll();
+                break;
             case R.id.EtBorrar_producto:
                 deleteProductCheck();
                 //adapterListCom.deleteProductCheck();
                 listView.invalidate();
                 actualizarPrecioYelementos();
                 return true;
+            case R.id.Adm_list:
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Lista Supers",arraySupers);
+              //  bundle.putStringArrayList("Name_Supers",arrayNombreSupers);
+                Intent intent = new Intent(lista_compra.this, Admin_list.class);
+                intent.putExtras(bundle);
+                startActivityForResult(intent,LOAD_DATA_MYSQL);
+                break;
             case R.id.action_settings:
                 Toast.makeText(lista_compra.this,"opciones",Toast.LENGTH_SHORT);
                 return true;
-            case R.id.share:
-                Toast.makeText(lista_compra.this,"COMPARTIR",Toast.LENGTH_SHORT);
+            case R.id.share_list:
                 createFileJSON();
                 return true;
         }
@@ -543,10 +564,11 @@ public class lista_compra extends AppCompatActivity{
             output.close();*/
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TITLE,"lista JSON");
+            sendIntent.putExtra(Intent.EXTRA_TITLE,"lista compra JSON");
             sendIntent.putExtra(Intent.EXTRA_TEXT, superJSON.toString());
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
+            Toast.makeText(lista_compra.this,"Datos compartidos",Toast.LENGTH_SHORT);
         } catch (Exception e) {
             e.printStackTrace();
         }

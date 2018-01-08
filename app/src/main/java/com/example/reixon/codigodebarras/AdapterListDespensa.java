@@ -32,29 +32,40 @@ import java.util.List;
     private ArrayList<Producto> searchList;
     private ViewHolder holder = null;
     private List<Producto> proList;
-    private int numSelectCheck;
-    private CheckProduct[] ArrayCheck;
     private lista_productos context;
     private MySQL mysql;
     private SQLiteDatabase db;
+    private boolean [] itemChecks;
+    private int numChecks;
+    private boolean checkAll;
 
     public AdapterListDespensa(Context context, int textViewResourceId,
                                ArrayList<Producto> listaProductosDada) {
         proList = listaProductosDada;
         searchList = listaProductosDada;
-        ArrayCheck = new CheckProduct[proList.size()];
         this.context = (lista_productos) context;
         mysql = new MySQL(context);
-        numSelectCheck=0;
+        itemChecks = new boolean[listaProductosDada.size()];
+        numChecks=0;
+        checkAll=false;
     }
 
+    public void setList(ArrayList<Producto> proTotal){
+        proList = proTotal;
+        searchList = (ArrayList)proTotal;
+        itemChecks = new boolean[proTotal.size()];
+        notifyDataSetChanged();
+    }
     public ArrayList<Producto>getSearchList(){
         return searchList;
     }
 
+    public boolean[] getItemCheck(){
+        return itemChecks;
+    }
+
     public void vaciarArrayCheck(){
-        ArrayCheck=new CheckProduct[proList.size()];
-        numSelectCheck=0;
+        itemChecks=new boolean[proList.size()];
         this.notifyDataSetChanged();
     }
 
@@ -65,38 +76,32 @@ import java.util.List;
         context.setProductosTotales(mysql.loadFullProduct(db));
         proList = context.getProductosTotales();
         searchList = context.getProductosTotales();
+        itemChecks = new boolean[proList.size()];
         //Producto p = context.getProductosTotales().get(context.getProductosTotales().size()-1);
 
         Toast.makeText(context, nombre +" creado", Toast.LENGTH_SHORT).show();
         this.notifyDataSetChanged();
     }
 
-    public void deleteProductCheck(){
-        int posSig;
-        String nombres="";
-        List<Producto> listProAux;
-        for(int i=0; i<numSelectCheck; i++){
-            db = mysql.getWritableDatabase();
-            mysql.eliminarProducto(ArrayCheck[i].getIdProducto(), db);
-            nombres = nombres +"\n"+searchList.get(ArrayCheck[i].getPosition()).getNombre();
+    public boolean getCheckAll(){
+        return checkAll;
+    }
+
+    public void setCheckAll(){
+        if(checkAll){
+            checkAll=false;
+            numChecks=0;
+            context.setVisibleDelete(false);
+        }
+        else{
+            checkAll=true;
+            numChecks=proList.size();
+            context.setVisibleDelete(true);
 
         }
-        db = mysql.getWritableDatabase();
-        proList = mysql.loadFullProduct(db);
-        searchList = (ArrayList)proList;
-        if(numSelectCheck>1) {
-            Toast.makeText(context, nombres + " eliminados", Toast.LENGTH_SHORT).show();
+        for(int i=0; i<itemChecks.length;i++){
+            itemChecks[i]=checkAll;
         }
-        else if(numSelectCheck==1){
-            Toast.makeText(context, nombres+" eliminado", Toast.LENGTH_SHORT).show();
-        }
-        context.setVisibleDelete(false);
-
-        ArrayCheck=new CheckProduct[proList.size()];
-        numSelectCheck=0;
-        context.setVisibleSpinnersSupers(View.GONE);
-        context.setVisibleButtomAnyadir(View.GONE);
-
         notifyDataSetChanged();
     }
 
@@ -191,7 +196,7 @@ import java.util.List;
 
     @Override
     public int getCount() {
-        return searchList.size();
+        return proList.size();
     }
 
     @Override
@@ -206,14 +211,10 @@ import java.util.List;
 
     public View getView(final int position, View convertView, ViewGroup parent) {
         try {
-            //  Log.d("MyApp", " View");
             if (convertView == null) {
-
-                //    Log.d("MyApp", "convertView null");
                 LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                //    Log.d("MyApp", "convertView layaoutInflater");
 
-                convertView = vi.inflate(R.layout.adapter_producto_stock, null);
+                convertView = vi.inflate(R.layout.stock_product_adapter, null);
                 holder = new ViewHolder();
                 holder.imagen = (ImageView) convertView
                         .findViewById(R.id.imagenListProductos);
@@ -224,91 +225,15 @@ import java.util.List;
                 holder.cantidad.setVisibility(View.GONE);
                 convertView.setTag(holder);
 
-               /* anyadirListBuy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        for(int i = 0; i< numSelectCheck; i++) {
-                            db = mysql.getWritableDatabase();
-                            mysql.add_Producto_A_Lista_SuperMercado(db, context.getSuperWithSpinnersPosition(context.getSpinnersSupersSelectedPosition()),
-                                    searchList.get(ArrayCheck[i].getPosition()));
-                            context.addProductListSuper(searchList.get(ArrayCheck[i].getPosition()));
-
-                        }
-                        numSelectCheck=0;
-                        context.setVisibleSpinnersSupers(View.GONE);
-                        context.setVisibleButtomAnyadir(View.GONE);
-                        context.setVisibleDelete(false);
-                        // searchItem.setVisible(true);
-                        ArrayCheck=new CheckProduct[searchList.size()];
-                        notifyDataSetChanged();
-
-                        Toast.makeText(context, "Añadido", Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-
-            /*    holder.check.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-
-                        CheckBox cb = (CheckBox) v;
-                        CheckProduct cp;
-                        if(cb.isChecked()) {
-                            Producto p = (Producto) v.getTag();
-                            //cp = new CheckProduct(p.getId(),position,true);
-                            //ArrayCheck[numSelectCheck]=cp;
-
-                            //numSelectCheck++;
-                            //   Log.d("MyApp", "Checked " + p.getNombre()+" numcheck "+ numSelectCheck+" position "+position);
-                            Toast.makeText(context, p.getNombre(),
-                                    Toast.LENGTH_SHORT).show();
-                            context.setVisibleDelete(true);
-                            //   searchItem.setVisible(false);
-
-                            //       Log.d("MyApp", "No visibles ");
-
-                            context.setVisibleSpinnersSupers(View.VISIBLE);
-                            context.setVisibleButtomAnyadir(View.VISIBLE);
-
-                        }
-                        else {
-                            //      Log.d("MyApp", "DesCheck ");
-
-                            for (int i = 0; i < numSelectCheck; i++) {
-                                if (ArrayCheck[i] != null) {
-                                    if (ArrayCheck[i].getPosition() == position) {
-                                        ArrayCheck[i] = null;
-                                    }
-                                }
-                            }
-                            numSelectCheck--;
-                            if(numSelectCheck==0) {
-                                context.setVisibleDelete(false);
-                                //    searchItem.setVisible(true);
-                                if (context.getVisibilitySpinnerSupers() == View.VISIBLE
-                                        && context.getVisibilityButtonAnyadir() == View.VISIBLE) {
-                                    context.setVisibleSpinnersSupers(View.GONE);
-                                    context.setVisibleButtomAnyadir(View.GONE);
-                                }
-                                Log.d("MyApp", "visibles ");
-                                context.setVisibleSpinnersSupers(View.GONE);
-                                context.setVisibleButtomAnyadir(View.GONE);
-
-                            }
-
-                        }
-                    }
-                });*/
-
             } else {
                 Log.d("MyApp", " View no null");
                 holder = (ViewHolder) convertView.getTag();
             }
-            Producto p = this.searchList.get(position);
+            Producto p = this.proList.get(position);
             holder.name.setText(p.getNombre() + " ");
             holder.precio.setText(p.getPrecio() + " ");
-            holder.check.setTag(p);
+            holder.check.setChecked(itemChecks[position]);
+            holder.check.setTag(position);
 
             if(p.getRutaImagen().equals("")) {
                 holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
@@ -317,20 +242,32 @@ import java.util.List;
                 //creamos un hilo para que cargue las imagenes
                 new loadImage(holder.imagen).execute(p.getRutaImagen());
             }
+            holder.check.setOnClickListener(new View.OnClickListener() {
 
-            if (numSelectCheck > 0) {
-                for(int i=0; i<numSelectCheck; i++) {
-                    if (ArrayCheck[i].getPosition() == position) {
-                        Log.d("MyApp", "Checked " + p.getNombre() + " numcheck " +
-                                ArrayCheck[i].isCheck());
-                        holder.check.setChecked(ArrayCheck[i].isCheck());
-                    } else {
-                        holder.check.setChecked(false);
+                @Override
+                public void onClick(View v) {
+
+                    CheckBox cb = (CheckBox) v;
+                    if(cb.isChecked()) {
+                        itemChecks[Integer.valueOf(position)]=cb.isChecked();
+                        numChecks++;
+                        Toast.makeText(context, proList.get(position).getNombre(),Toast.LENGTH_SHORT);
+
+                        if(numChecks>0) {
+                            context.setVisibleDelete(true);
+                        }
                     }
+                    else {
+                        itemChecks[Integer.valueOf(position)]=cb.isChecked();
+                        numChecks--;
+                        if(numChecks==0){
+                            checkAll=false;
+                            context.setVisibleDelete(false);
+                        }
+                    }
+                    cb.setChecked(itemChecks[position]);
                 }
-            } else if (numSelectCheck == 0) {
-                holder.check.setChecked(false);
-            }
+            });
         }
         catch (Exception e){ e.printStackTrace();  Log.d("MyApp", e.getLocalizedMessage());}
         return convertView;

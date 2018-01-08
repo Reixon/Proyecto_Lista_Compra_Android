@@ -11,12 +11,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class activity_categories_expanable extends BaseExpandableListAdapter {
+public class Adapter_categories_expanable extends BaseExpandableListAdapter {
     private Context mcontext;
     private ArrayList<Category> mCategories;
     private LayoutInflater mInflater;
 
-    public activity_categories_expanable(Context context, ArrayList<Category> groups) {
+    public Adapter_categories_expanable(Context context, ArrayList<Category> groups) {
         this.mcontext = context;
         mCategories = groups;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -62,7 +62,7 @@ public class activity_categories_expanable extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         if(convertView==null){
-            convertView = mInflater.inflate(R.layout.adapter_category,null);
+            convertView = mInflater.inflate(R.layout.category_adapter_header,null);
         }
         Category category = (Category)getGroup(groupPosition);
         TextView textView = (TextView) convertView.findViewById(R.id.et_category);
@@ -74,7 +74,7 @@ public class activity_categories_expanable extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
         if(convertView==null){
-            convertView = mInflater.inflate(R.layout.adapter_producto_stock,null);
+            convertView = mInflater.inflate(R.layout.stock_product_adapter,null);
         }
         Producto p = (Producto) getChild(groupPosition, childPosition);
 

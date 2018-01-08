@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
@@ -47,29 +46,22 @@
         <activity
             android:name=".lista_productos"
             android:label="@string/title_activity_stock_product"
-            android:parentActivityName=".Father"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.reixon.codigodebarras.Father" />
-        </activity>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ViewProduct"
-            android:parentActivityName=".Father"
             android:screenOrientation="portrait" />
         <activity
             android:name=".lista_compra"
-            android:parentActivityName=".Father"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activity_list_products_expanable" />
         <activity
-            android:name=".tab"
-            android:label="@string/title_activity_tab"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".Admin_list"></activity>
     </application>
 
 </manifest>

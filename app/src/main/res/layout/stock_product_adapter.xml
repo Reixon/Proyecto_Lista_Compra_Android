@@ -1,9 +1,9 @@
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="395dp"
-        android:layout_height="587dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp">
 
 
         <ImageView
@@ -11,8 +11,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/photo_icon"
-            android:layout_margin="10dp"/>
+            android:layout_margin="10dp"
+            android:src="@drawable/photo_icon" />
 
         <TextView
             android:id="@+id/nombre"
@@ -22,8 +22,8 @@
             android:layout_alignTop="@+id/imagenListProductos"
             android:layout_marginRight="30dp"
             android:layout_marginStart="50dp"
-            android:text="nombre"
             android:maxLength="30"
+            android:text="nombre"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -31,30 +31,30 @@
             android:id="@+id/etcheckBox"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:layout_alignTop="@+id/nombre"
+            android:layout_alignBottom="@+id/txt_precio_prod"
             android:layout_alignParentEnd="true"
-            android:layout_alignBottom="@+id/txt_precio_prod" />
+            android:layout_alignTop="@+id/nombre"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
 
         <TextView
             android:id="@+id/txt_precio_prod"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="precio"
-            android:maxLength="10"
-            android:textAlignment="textStart"
             android:layout_below="@+id/nombre"
-            android:layout_toEndOf="@+id/txtMoneda" />
+            android:layout_toEndOf="@+id/txtMoneda"
+            android:maxLength="10"
+            android:text="precio"
+            android:textAlignment="textStart" />
 
         <TextView
             android:id="@+id/txtMoneda"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" € "
             android:layout_alignBaseline="@+id/txt_precio_prod"
             android:layout_alignBottom="@+id/txt_precio_prod"
-            android:layout_alignStart="@+id/nombre" />
+            android:layout_alignStart="@+id/nombre"
+            android:text=" € " />
 
         <TextView
             android:id="@+id/txtCantidad"
@@ -66,4 +66,4 @@
             android:text="(1)"
             android:textSize="14sp"
             android:textStyle="bold" />
-    </RelativeLayout>
+</RelativeLayout>

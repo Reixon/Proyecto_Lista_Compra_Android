@@ -21,27 +21,25 @@ import java.util.Locale;
 
 public class AdapterListBuyProd extends BaseAdapter {
     private ArrayList<Producto> searchList;
-    private ViewHolder holder = null;
+    private ViewHolder holder;
     private List<Producto> proList;
-    private int numSelectCheck;
-    private CheckProduct[] ArrayCheck;
     private MySQL mysql;
-    private lista_compra listCompraContext;
+    private lista_compra context;
     private SQLiteDatabase db;
     private SuperMerc sp;
-    private final int CATEGORIA=0, PRODUCTO=1;
-    private ArrayList<ViewHolder> listaViewHolder;
-
+    private boolean [] itemChecks;
+    private int numChecks;
+    private boolean checkAll;
 
     public AdapterListBuyProd(Context context,
             int textViewResourceId, ArrayList<Producto> listaProductosDada) {
-        listCompraContext = (lista_compra) context;
+        this.context = (lista_compra) context;
         proList = listaProductosDada;
         searchList = listaProductosDada;
         //ArrayCheck = new CheckProduct[proList.size()];
         //numSelectCheck=0;
         mysql = new MySQL(context);
-        sp = listCompraContext.getSuperMerc();
+        sp = this.context.getSuperMerc();
     }
 
     /*public void vaciarArrayCheck(){
@@ -53,6 +51,23 @@ public class AdapterListBuyProd extends BaseAdapter {
     public void setList(ArrayList<Producto> listP){
         this.proList=listP;
         this.searchList=listP;
+    }
+
+    public void setCheckAll(){
+        if(checkAll){
+            checkAll=false;
+            numChecks=0;
+            context.setVisibleDelete(false);
+        }
+        else{
+            checkAll=true;
+            numChecks=proList.size();
+
+        }
+        for(int i=0; i<itemChecks.length;i++){
+            itemChecks[i]=checkAll;
+        }
+        notifyDataSetChanged();
     }
 
     /*public void deleteProductCheck(){
@@ -68,8 +83,8 @@ public class AdapterListBuyProd extends BaseAdapter {
         }
         proList = sp.getProductos();
         searchList = sp.getProductos();
-        Toast.makeText(listCompraContext, nombres + " eliminados", Toast.LENGTH_SHORT).show();
-        listCompraContext.getDelete().setVisible(false);
+        Toast.makeText(context, nombres + " eliminados", Toast.LENGTH_SHORT).show();
+        context.getDelete().setVisible(false);
 
         notifyDataSetChanged();
     }*/
@@ -82,6 +97,7 @@ public class AdapterListBuyProd extends BaseAdapter {
         CheckBox check;
         TextView et_category;
     }
+
 
     @Override
     public int getCount() {
@@ -136,10 +152,10 @@ public class AdapterListBuyProd extends BaseAdapter {
         try {
             if (convertView == null)
             {
-                LayoutInflater vi = (LayoutInflater) listCompraContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 holder = new ViewHolder();
 
-                convertView = vi.inflate(R.layout.adapter_producto_stock, null);
+                convertView = vi.inflate(R.layout.stock_product_adapter, null);
                 holder.imagen = (ImageView) convertView
                         .findViewById(R.id.imagenListProductos);
                 holder.name = (TextView) convertView.findViewById(R.id.nombre);
@@ -173,7 +189,7 @@ public class AdapterListBuyProd extends BaseAdapter {
                 }
                 holder.precio.setText(precioXCant + " ");
                 if (p.getRutaImagen().equals("")) {
-                    holder.imagen.setImageDrawable(listCompraContext.getResources().getDrawable(R.drawable.photo_icon));
+                    holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
                 }
                 holder.cantidad.setText(" (" + proList.get(position).getCantidad() + ")");
 
@@ -191,13 +207,10 @@ public class AdapterListBuyProd extends BaseAdapter {
                             x=1;
                             holder.name.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
 
-                            /*FALTA TACHAR EL TEXTVIEW DEL NOMBRE*/
-                            //delete menu true
                         } else {
                             holder.name.setPaintFlags(Paint.LINEAR_TEXT_FLAG);
                             proList.get(pos).setCheck(false);
                             x=0;
-                        //    delete.setVisible(false);
                         }
                         db = mysql.getWritableDatabase();
                         mysql.modificarSuperMerc_Productos(x+"","checked",proList.get(pos),sp,db);

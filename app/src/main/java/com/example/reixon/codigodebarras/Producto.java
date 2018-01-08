@@ -18,6 +18,7 @@ public class Producto implements Serializable {
         rutaImagen="";
         codigo="";
         precio=0.0;
+        check=false;
     }
 
     public Producto(String nombre){
@@ -25,12 +26,14 @@ public class Producto implements Serializable {
         this.precio=0.0;
         rutaImagen="";
         codigo="";
+        check=false;
     }
     public Producto (String nombre, String codigo, String rutaImagen){
         this.nombre = nombre;
         this.codigo = codigo;
         this.rutaImagen = rutaImagen;
         this.precio=0.0;
+        check=false;
     }
 
     public Producto(int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int unidad) {
@@ -41,6 +44,7 @@ public class Producto implements Serializable {
         this.codigo = codigo;
         this.categoria= categoria;
         this.unidad = unidad;
+        check=false;
     }
 
     public Producto(int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int cantidad, int unidad) {
@@ -52,6 +56,7 @@ public class Producto implements Serializable {
         this.categoria= categoria;
         this.cantidad = cantidad;
         this.unidad =unidad;
+        check=false;
     }
 
     public int getId() {

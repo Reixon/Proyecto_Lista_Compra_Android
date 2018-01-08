@@ -29,7 +29,6 @@ public class Inicio extends AppCompatActivity {
     private boolean pause;
     private static final int LOAD_DATA_MYSQL=100;
     private boolean loadData;
-    private tab.SectionsPagerAdapter mSectionsPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +41,15 @@ public class Inicio extends AppCompatActivity {
         btStock2 = (ImageButton)findViewById(R.id.btStock2);
         btListaCompra =(ImageButton)findViewById(R.id.btListaCompra);
         btScanner = (ImageButton)findViewById(R.id.btScanner);
-        //En caso de que la BD de superMercados este vacia, añadimos una nueva lista
-        //y añadimos la nueva lista al array de supermercados "arraySupers"
+
         mysql = new MySQL(this);
-        db = mysql.getWritableDatabase();
+     /*   db = mysql.getWritableDatabase();
         arraySupers=mysql.cargarSuperMercadosBD(db);
         productoTotal = mysql.loadFullProduct(db);
-        arrayCategories = mysql.loadCategorias(db);
-        db.close();
-        if(arraySupers.size()==0) {
-            mysql.addSuper(db, new SuperMerc("lista", 0, 0));
+        arrayCategories = mysql.loadCategorias(db);*/
+
             //arraySupers=mysql.cargarSuperMercadosBD(db);
-        }
+
         btStock2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +65,7 @@ public class Inicio extends AppCompatActivity {
                 Bundle b = new Bundle();
                 b.putSerializable("Lista Supers", arraySupers);
                 b.putSerializable("Full Products", productoTotal);
+                b.putSerializable("Array Categories", arrayCategories);
                 Intent i = new Intent(Inicio.this, lista_productos.class);
                 i.putExtras(b);
                 startActivity(i);
@@ -112,11 +109,12 @@ public class Inicio extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(loadData) {
+    //    if(loadData) {
             db = mysql.getWritableDatabase();
             arraySupers=mysql.cargarSuperMercadosBD(db);
             productoTotal=mysql.loadFullProduct(db);
-        }
+            arrayCategories = mysql.loadCategorias(db);
+    //    }
 
     }
 
