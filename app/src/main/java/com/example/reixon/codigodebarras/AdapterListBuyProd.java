@@ -2,7 +2,9 @@ package com.example.reixon.codigodebarras;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Paint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +12,14 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by reixon on 29/10/2017.
@@ -36,8 +42,8 @@ public class AdapterListBuyProd extends BaseAdapter {
         this.context = (lista_compra) context;
         proList = listaProductosDada;
         searchList = listaProductosDada;
-        //ArrayCheck = new CheckProduct[proList.size()];
-        //numSelectCheck=0;
+        itemChecks = new boolean[listaProductosDada.size()];
+        numChecks=0;
         mysql = new MySQL(context);
         sp = this.context.getSuperMerc();
     }
@@ -70,65 +76,18 @@ public class AdapterListBuyProd extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    /*public void deleteProductCheck(){
-        int posSig;
-        String nombres="";
-        for(int i=0; i<searchList.size(); i++){
-            if(searchList.get(i).isCheck()) {
-                db = mysql.getWritableDatabase();
-                mysql.eliminar_Producto_D_SuperMerc_Producto(searchList.get(i).getId(), sp.getId(), db);
-                nombres = nombres + "\n" + searchList.get(i).getNombre()+"";
-                sp.eliminarProducto(i);
-            }
-        }
-        proList = sp.getProductos();
-        searchList = sp.getProductos();
-        Toast.makeText(context, nombres + " eliminados", Toast.LENGTH_SHORT).show();
-        context.getDelete().setVisible(false);
-
-        notifyDataSetChanged();
-    }*/
-
     private class ViewHolder {
         TextView name;
         ImageView imagen;
         TextView precio;
         TextView cantidad;
         CheckBox check;
-        TextView et_category;
     }
 
 
     @Override
     public int getCount() {
         return proList.size();
-    }
-
-    public void filter(String charText){
-        charText = charText.toLowerCase(Locale.getDefault());
-        searchList.clear();
-        if(charText.length() == 0){
-            proList.addAll(searchList);
-        }else
-        {
-            for(Producto postDetail : searchList){
-                if(charText.length()!=0 && postDetail.getNombre().toLowerCase(
-                        Locale.getDefault()).contains(charText))
-                {
-                    proList.add(postDetail);
-                    //encuentra=false;
-                }
-            }
-            db = mysql.getWritableDatabase();
-            Producto p =mysql.searchProductoWithName(charText,db);
-            if(p!=null){
-
-                //encuentra=true;
-            }
-
-        }
-        //   Log.d("MyApp","notificacion");
-        notifyDataSetChanged();
     }
 
    public void setSuper(SuperMerc sm){
@@ -167,20 +126,15 @@ public class AdapterListBuyProd extends BaseAdapter {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-        /*    if(proList.get(position).getCategoria()!=-1) {
-
-            }
-            else
-            {*/
-
                 Producto p = this.proList.get(position);
                 holder.name.setText(p.getNombre() + " ");
-                if(p.isCheck()){
-                    holder.check.setChecked(true);
+                holder.check.setChecked(itemChecks[position]);
+                if(p.getRutaImagen().equals("")) {
+                    holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
                 }
                 else{
-                    holder.check.setChecked(false);
-
+                    //creamos un hilo para que cargue las imagenes
+                    new loadImage(holder.imagen).execute(p.getRutaImagen());
                 }
                 holder.check.setTag(position);
                 double precioXCant = 0;
@@ -188,39 +142,74 @@ public class AdapterListBuyProd extends BaseAdapter {
                     precioXCant = p.getPrecio() * p.getCantidad();
                 }
                 holder.precio.setText(precioXCant + " ");
-                if (p.getRutaImagen().equals("")) {
-                    holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
-                }
                 holder.cantidad.setText(" (" + proList.get(position).getCantidad() + ")");
 
                 holder.check.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
+                    CheckBox cb = (CheckBox) v;
+                    if(cb.isChecked()) {
+                        itemChecks[Integer.valueOf(position)]=cb.isChecked();
+                        numChecks++;
+                        Toast.makeText(context, proList.get(position).getNombre(),Toast.LENGTH_SHORT);
 
-                        CheckBox cb = (CheckBox) v;
-                        int pos=(int) v.getTag();
-
-                        int x=0;
-                        if (cb.isChecked()) {
-                            proList.get(pos).setCheck(true);
-                            x=1;
-                            holder.name.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-
-                        } else {
-                            holder.name.setPaintFlags(Paint.LINEAR_TEXT_FLAG);
-                            proList.get(pos).setCheck(false);
-                            x=0;
+                        if(numChecks>0) {
+                            context.setVisibleDelete(true);
                         }
-                        db = mysql.getWritableDatabase();
-                        mysql.modificarSuperMerc_Productos(x+"","checked",proList.get(pos),sp,db);
-                        notifyDataSetChanged();
+                    }
+                    else {
+                        itemChecks[Integer.valueOf(position)]=cb.isChecked();
+                        numChecks--;
+                        if(numChecks==0){
+                            checkAll=false;
+                            context.setVisibleDelete(false);
+                        }
+                    }
+                    cb.setChecked(itemChecks[position]);
                     }
                 });
             //}
         }
         catch (Exception e){  e.printStackTrace();}
         return convertView;
+    }
+
+    private class loadImage extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageRef;
+        //private ProgressDialog dialog;
+        private loadImage(ImageView imageRef) {
+            this.imageRef = new WeakReference<ImageView>(imageRef);
+            //        dialog = new ProgressDialog(activity);
+        }
+    /*    @Override
+        protected void onPreExecute(){
+            dialog.setMessage("Cargando. Espere por favor.");
+            dialog.show();
+        }*/
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            InputStream ims = null;
+            Bitmap image =null;
+            try {
+                ims = new FileInputStream(params[0]);
+                image = BitmapFactory.decodeStream(ims);
+                    /*    Bitmap imageResize = Bitmap.createScaledBitmap(image,
+                                50, 50, true);*/
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            return image;
+        }
+
+        protected void onPostExecute(Bitmap image){
+         /*   if (dialog.isShowing()) {
+                dialog.dismiss();
+            }*/
+            ImageView imageView = imageRef.get();
+            imageView.setImageBitmap(image);
+        }
     }
 
 }

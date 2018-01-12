@@ -10,4 +10,8 @@
         android:id="@+id/share_products"
         android:title="@string/action_share_products"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/download_products"
+        android:title="Descargar Productos"
+        app:showAsAction="never" />
 </menu>

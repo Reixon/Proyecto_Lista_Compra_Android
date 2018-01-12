@@ -402,12 +402,9 @@ public class Add_product extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d("MyApp","Aceptar");
                 int idCategoria;
-                if(arrayCategoria.size()==0){
-                    idCategoria=0;
-                }
-                else{
-                    idCategoria = arrayCategoria.get(unidadSelec).getId();
-                }
+
+                idCategoria = arrayCategoria.get(unidadSelec).getId();
+
                 //guardar la imagen en la memoria del movil y cambiar la direccion de la imagen de producto
                 if(!txtNameProduct.getText().toString().equals("")) {
                     if(imagePath.equals("") && !producto.getRutaImagen().equals("")){

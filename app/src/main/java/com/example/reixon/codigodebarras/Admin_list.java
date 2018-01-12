@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -42,7 +43,53 @@ public class Admin_list extends AppCompatActivity {
         //Pasar solo los nombres de los superM
         adapterListAdmin = new Adapter(this,R.layout.list_adapter_adm,arraySupers);
         listView.setAdapter(adapterListAdmin);
+        nameSuperM= new ArrayList<String>();
+        for(int i=0; i<arraySupers.size(); i++){
+            nameSuperM.add(arraySupers.get(i).getNombre());
+        }
+
+        Button buttonCreate = (Button) findViewById(R.id.buttonAdminList);
+
+        buttonCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(Admin_list.this);
+                builder.setTitle("Añadir lista de compra");
+
+                final EditText edit = new EditText(Admin_list.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                edit.setLayoutParams(lp);
+                builder.setView(edit);
+
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db = mysql.getWritableDatabase();
+                        SuperMerc lS = new SuperMerc(edit.getText().toString(), 0, 0);
+                        mysql.addSuper(db, lS);
+                        arraySupers.add(lS);
+                        nameSuperM.add(lS.getNombre());
+                        adapterListAdmin.setArraySupers(arraySupers);
+                        adapterListAdmin.notifyDataSetChanged();
+
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
+
     }
+
+
 
     public class Adapter extends BaseAdapter {
 
@@ -54,6 +101,10 @@ public class Admin_list extends AppCompatActivity {
             mysql = new MySQL(context);
             this.arraySupers = arraySupers;
             holder = null;
+        }
+
+        public void setArraySupers(ArrayList supers){
+            this.arraySupers=supers;
         }
 
         @Override

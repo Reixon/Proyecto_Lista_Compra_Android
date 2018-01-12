@@ -16,14 +16,14 @@
 
         <TextView
             android:id="@+id/nombre"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_alignStart="@+id/imagenListProductos"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@+id/imagenListProductos"
-            android:layout_marginRight="30dp"
-            android:layout_marginStart="50dp"
-            android:maxLength="30"
+            android:layout_toEndOf="@+id/imagenListProductos"
+            android:ems="25"
+            android:maxLines="1"
             android:text="nombre"
+            android:textAlignment="viewStart"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -60,8 +60,8 @@
             android:id="@+id/txtCantidad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/nombre"
             android:layout_alignBottom="@+id/nombre"
-            android:layout_alignTop="@+id/nombre"
             android:layout_toEndOf="@+id/nombre"
             android:text="(1)"
             android:textSize="14sp"

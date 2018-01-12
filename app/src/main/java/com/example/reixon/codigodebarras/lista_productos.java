@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 
 public class lista_productos extends AppCompatActivity {
 
-    private AdapterListDespensa adapterListPro;
+    private AdapterListStock adapterListPro;
     private ArrayList<String> listaSuperNombre;
     private ArrayList<SuperMerc>arraySupers;
     private ArrayList<Producto>productoTotal;
@@ -138,7 +138,6 @@ public class lista_productos extends AppCompatActivity {
                     integrator.setBarcodeImageEnabled(true);
                     integrator.initiateScan();
                 }
-
             }
         });
 
@@ -197,7 +196,7 @@ public class lista_productos extends AppCompatActivity {
                         //addProductListSuper(searchList.get(ArrayCheck[i].getPosition()));
                     }
                 }
-                setVisibleDelete(false);
+                setVisibleMenusActive(false);
                 adapterListPro.vaciarArrayCheck();
 
                 Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
@@ -217,6 +216,7 @@ public class lista_productos extends AppCompatActivity {
                     spinnerSupers.setVisibility(View.GONE);
                     anyadirListBuy.setVisibility(View.GONE);
                     adapterListPro.vaciarArrayCheck();
+                    setVisibleMenusActive(false);
                 }
                 if(!s.toString().equals("")){
                     btOk.setVisibility(View.VISIBLE);
@@ -228,16 +228,14 @@ public class lista_productos extends AppCompatActivity {
                     bt_speak.setVisibility(View.VISIBLE);
                     btCode.setVisibility(View.VISIBLE);
                 }
-
             }
-
             @Override
             public void afterTextChanged(Editable s) {
 
             }
         });
 
-        adapterListPro = new AdapterListDespensa(this,
+        adapterListPro = new AdapterListStock(this,
                 R.layout.stock_product_adapter, productoTotal);
 
         listView = (ListView) findViewById(R.id.listaProductos);
@@ -265,6 +263,7 @@ public class lista_productos extends AppCompatActivity {
     public void setProductosTotales(ArrayList<Producto> p){
         productoTotal = p;
     }
+
     public ArrayList<Producto> getProductosTotales(){
         return productoTotal;
     }
@@ -291,7 +290,7 @@ public class lista_productos extends AppCompatActivity {
         productoTotal = mysql.loadFullProduct(db);
 
         Toast.makeText(this, nombres+" eliminado", Toast.LENGTH_SHORT).show();
-        this.setVisibleDelete(false);
+        this.setVisibleMenusActive(false);
         adapterListPro.setList(productoTotal);
     }
 
@@ -304,9 +303,6 @@ public class lista_productos extends AppCompatActivity {
             loadData=false;
             adapterListPro.setList(productoTotal);
         }
-        txt_edit.clearFocus();
-
-
     }
 
     @Override
@@ -389,7 +385,8 @@ public class lista_productos extends AppCompatActivity {
     }
 
 
-    public void setVisibleDelete(Boolean b){
+
+    public void setVisibleMenusActive(Boolean b){
         if(b){
             anyadirListBuy.setVisibility(View.VISIBLE);
             spinnerSupers.setVisibility(View.VISIBLE);
@@ -436,6 +433,9 @@ public class lista_productos extends AppCompatActivity {
                 createFileJSON();
                 Toast.makeText(lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
                 return true;
+            case R.id.download_products:
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -447,7 +447,7 @@ public class lista_productos extends AppCompatActivity {
         if(menu_active){
             menu.clear();
             getMenuInflater().inflate(R.menu.main_menu_active, menu);
-            if(adapterListPro.getCheckAll()){
+            if(adapterListPro.getCheckAll() || adapterListPro.getStateCheckMenu()){
                 menu.getItem(1).setIcon(R.drawable.icon_check_off);
             }
             else{
@@ -494,10 +494,11 @@ public class lista_productos extends AppCompatActivity {
         try {
             product = new JSONObject();
             for(int i=0; i<this.productoTotal.size(); i++){
+                product = new JSONObject();
                 product.put("name", productoTotal.get(i).getNombre());
-                //int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int cantidad, int unidad
                 product.put("price", productoTotal.get(i).getPrecio());
-                product.put("image", productoTotal.get(i).getRutaImagen());
+                //product.put("image", productoTotal.get(i).getRutaImagen());
+                //imagen pasarla a bytes o no pasarla
                 product.put("codigo", productoTotal.get(i).getCodigo());
                 for(int x =0; x<arrayCategories.size(); x++){
                     if(arrayCategories.get(x).getId()== productoTotal.get(i).getCategoria()){

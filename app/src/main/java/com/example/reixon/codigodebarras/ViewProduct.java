@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +50,6 @@ import static com.example.reixon.codigodebarras.R.id.btEditCategoria;
 public class ViewProduct extends AppCompatActivity {
 
     private static String APP_DIRECTORY ="Imagenes_MyShop/";
-    private static String MEDIA_DIRECTORY= APP_DIRECTORY +"PictureApp";
     private final int SELECT_PICTURE =300;
     private final int MY_PERMISSIONS=100;
     private final int PHOTO_CODE=101;
@@ -93,7 +93,7 @@ public class ViewProduct extends AppCompatActivity {
         txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
         etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
         layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
-        layout_cant.setVisibility(View.GONE);
+
         layout = (RelativeLayout)findViewById(R.id.layout_view_product);
 
         txtPrecioTotal.setVisibility(View.GONE);
@@ -117,13 +117,11 @@ public class ViewProduct extends AppCompatActivity {
     /*    db = mysql.getWritableDatabase();
         arraySuper = mysql.cargarSuperMercadosBD(db);*/
         arrayCategoriaN = new ArrayList<String>();
-        if (arrayCategoria.size() == 0) {
-            arrayCategoriaN.add(0, "Ninguna");
-        } else {
-            for (int i = 0; i < arrayCategoria.size(); i++) {
-                arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
-            }
+
+        for (int i = 0; i < arrayCategoria.size(); i++) {
+            arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
         }
+
         /*Cargar datos de activity anterior*/
         if (getIntent().getExtras() != null) {
             Bundle b = getIntent().getExtras();
@@ -133,13 +131,17 @@ public class ViewProduct extends AppCompatActivity {
                 for (int i = 0; i < arraySuper.size(); i++) {
                     arrayNombreSupers.add(arraySuper.get(i).getNombre());
                 }
-
                 spinnerUnidad.setAdapter(new ArrayAdapter<String>(this,
                         android.R.layout.simple_list_item_1, arrayUnidad));
 
                 spinnerListaCompra.setAdapter(new ArrayAdapter<String>(this,
                         android.R.layout.simple_list_item_1, arrayNombreSupers));
-
+                if(b.getBoolean("LISTA_COMPRA")){
+                    layout_cant.setVisibility(View.VISIBLE);
+                }
+                else{
+                    layout_cant.setVisibility(View.GONE);
+                }
             }
             if (b.getSerializable("Producto") != null) {
                 Log.d("MyApp", "Existe un producto desde lista");
@@ -171,11 +173,9 @@ public class ViewProduct extends AppCompatActivity {
 
                     }
                 }
-                if (p.getCategoria() != -1) {
-                    for (int i = 0; i < arrayCategoria.size(); i++) {
-                        if (arrayCategoria.get(i).getId() == p.getCategoria()) {
-                            spinner_categorias.setSelection(i);
-                        }
+                for (int i = 0; i < arrayCategoria.size(); i++) {
+                    if (arrayCategoria.get(i).getId() == p.getCategoria()) {
+                       unidadSelec=i;
                     }
                 }
                 txtScan.setVisibility(View.VISIBLE);
@@ -208,15 +208,17 @@ public class ViewProduct extends AppCompatActivity {
 
                     }
                 }
-                if (p.getCategoria() != -1)
-                    for (int i = 0; i < arrayCategoria.size(); i++) {
-                        if (arrayCategoria.get(i).getId() == p.getCategoria()) {
-                            spinner_categorias.setSelection(i);
-                        }
+
+                for (int i = 0; i < arrayCategoria.size(); i++) {
+                    if (arrayCategoria.get(i).getId() == p.getCategoria()) {
+                        unidadSelec=i;
                     }
+                }
                 txtScan.setVisibility(View.VISIBLE);
                 b.remove("Producto_scanner");
             }
+            spinner_categorias.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayCategoriaN));
+            spinner_categorias.setSelection(unidadSelec);
             this.setTitle(p.getNombre());
         }
 
@@ -230,9 +232,6 @@ public class ViewProduct extends AppCompatActivity {
                 setResult(RESULT_OK);
             }
         });
-
-
-        spinner_categorias.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayCategoriaN));
 
         btPhot.setOnClickListener(new View.OnClickListener() {
 
@@ -464,7 +463,6 @@ public class ViewProduct extends AppCompatActivity {
             capture.putExtra("return-data",true);
             startActivityForResult(capture,this.PHOTO_CODE);*/
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString());
             intent.putExtra("crop",true);
             intent.putExtra("aspectX",3);
             intent.putExtra("aspectY",4);
@@ -532,12 +530,9 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
             int idCategoria, cant=1;
-            if(arrayCategoria.size()==0){
-                idCategoria=-1;
-            }
-            else{
-                idCategoria = arrayCategoria.get(spinner_categorias.getSelectedItemPosition()).getId();
-            }
+
+            idCategoria = arrayCategoria.get(spinner_categorias.getSelectedItemPosition()).getId();
+
             if(!txtCant.getText().toString().equals("")){
                 cant=Integer.parseInt(txtCant.getText().toString());
             }
@@ -549,6 +544,9 @@ public class ViewProduct extends AppCompatActivity {
                         deleteFileImage();
                     }
                     loadImagePath();
+                }
+                else{
+                    imagePath=p.getRutaImagen();
                 }
                 Producto px = new Producto(p.getId(), txtNameProduct.getText().toString(),
                         Double.parseDouble(txtPrecioProducto.getText().toString()), imagePath,
@@ -654,8 +652,9 @@ public class ViewProduct extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         Bundle extras;
+        super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK) {
-           /* IntentResult result = IntentIntegrator.parseActivityResult(requestCode,
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode,
                     resultCode, data);
             if (result != null) {
                 Log.d("MyApp", " Scanner result");
@@ -666,7 +665,7 @@ public class ViewProduct extends AppCompatActivity {
                     txtScan.setText(result.getContents());
                     txtScan.setVisibility(View.VISIBLE);
                 }
-            } else {*/
+            } else {
 
                 switch (requestCode) {
 
@@ -683,7 +682,7 @@ public class ViewProduct extends AppCompatActivity {
                         break;
 
                 }
-        //    }
+            }
         }
     }
 

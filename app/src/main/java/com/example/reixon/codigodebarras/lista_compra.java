@@ -34,7 +34,6 @@ import org.json.JSONObject;
 
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
 public class lista_compra extends AppCompatActivity{
@@ -116,10 +115,6 @@ public class lista_compra extends AppCompatActivity{
         spinner_super.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, arrayNombreSupers));
 
-
-
-
-
     /*
             // listaProductosCompra = ordenadrYAnyadirCategoria();
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -148,13 +143,13 @@ public class lista_compra extends AppCompatActivity{
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int pos,
                                     long id) {
-
                 Producto p = listaProductosCompra.get(pos);
                 SuperMerc superM =  arraySupers.get(spinner_super.getSelectedItemPosition());
             //    delete.setVisible(false);
                 Bundle b = new Bundle();
                 b.putSerializable("Producto", p);
                 b.putSerializable("Lista Supers", arraySupers);
+                b.putBoolean("LISTA_COMPRA",true);
                 Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
                 intentViewProduct.putExtras(b);
                 startActivityForResult(intentViewProduct,LOAD_DATA_MYSQL);
@@ -181,7 +176,6 @@ public class lista_compra extends AppCompatActivity{
         btCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(v.getId()==R.id.bt_scanner_search) {
                     IntentIntegrator integrator = new IntentIntegrator(lista_compra.this);
                     integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
@@ -225,31 +219,6 @@ public class lista_compra extends AppCompatActivity{
 
                 if((keyCode == KeyEvent.KEYCODE_ENTER)&& event.getAction()== KeyEvent.ACTION_DOWN){
                     insertarProducto();
-
-
-                    //    if (encuentra==false || productoTotal.size() == 0) {
-                        /*Intent intentAddProducto = new Intent(activity_lista_productos.this, Add_product.class);
-                        Bundle b = new Bundle();
-                        b.putString("AddProducto", txt.getText().toString());
-                        intentAddProducto.putExtras(b);
-                        txt.clearFocus();
-                        txt.setText("");
-                        startActivity(intentAddProducto);*/
-
-                    // encuentra=false;
-                /*    }
-                    else if(encuentra==true){
-                        db = mysql.getWritableDatabase();
-                        Producto p =mysql.searchProductoWithName(txt.getText().toString(),db);
-                        Bundle b = new Bundle();
-                        b.putSerializable("Producto", p);
-                        Intent intentViewProduct= new Intent(activity_lista_productos.this, ViewProduct.class);
-                        intentViewProduct.putExtras(b);
-                        txt.clearFocus();
-                        txt.setText("");
-                        encuentra=false;
-                        startActivity(intentViewProduct);
-                    }*/
                 }
                 return false;
             }
@@ -321,6 +290,12 @@ public class lista_compra extends AppCompatActivity{
             arraySupers = mysql.cargarSuperMercadosBD(db);
             sp = arraySupers.get(spinner_super.getSelectedItemPosition());
             listaProductosCompra = sp.getProductos();
+            arrayNombreSupers = new ArrayList<String>();
+            for(int i=0; i<arraySupers.size(); i++){
+                arrayNombreSupers.add(arraySupers.get(i).getNombre());
+            }
+            spinner_super.setAdapter(new ArrayAdapter<String>(lista_compra.this,
+                    android.R.layout.simple_list_item_1, arrayNombreSupers));
             productoTotal = mysql.loadFullProduct(db);
             adapterListCom.setSuper(sp);
             loadData=false;
@@ -330,18 +305,6 @@ public class lista_compra extends AppCompatActivity{
 
     }
 
-    public ArrayList ordenadrYAnyadirCategoria(){
-        ArrayList temp = new ArrayList();
-        ArrayList sort = listaProductosCompra;
-        Collections.sort(sort);
-        int headId=-1;
-        for(int i=0; i<sort.size(); i++){
-            if(headId != listaProductosCompra.get(i).getId()){
-
-            }
-        }
-        return temp;
-    }
 
     public void insertarProducto(){
         db = mysql.getWritableDatabase();
@@ -389,8 +352,6 @@ public class lista_compra extends AppCompatActivity{
                                 i.putExtra("SuperMerc", sp);
                                 i.putExtra("Lista Supers", arraySupers);
                                 startActivityForResult(i,LOAD_DATA_MYSQL);
-
-
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -457,48 +418,6 @@ public class lista_compra extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
 
             getMenuInflater().inflate(R.menu.main_menu_buy_list, menu);
-            //searchItem = main_menu.findItem(R.id.search_list_products);
-            //compartir = main_menu.findItem(R.id.compartir);
-
-            // sv = (SearchView) MenuItemCompat.getActionView(searchItem);
-        //    delete = menu.findItem(R.id.EtBorrar_producto);
-        //    delete.setVisible(false);
-
-     /*   sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (encuentra==false || listaProductosCompra.size() == 0) {
-                    Intent intentAddProducto = new Intent(lista_compra.this, Add_product.class);
-                    Bundle b = new Bundle();
-                    b.putString("AddProducto", query.toString());
-                    intentAddProducto.putExtras(b);
-                    sv.clearFocus();
-                    startActivity(intentAddProducto);
-                }
-                else if(encuentra==true){
-                    db = mysql.getWritableDatabase();
-                    Producto p =mysql.searchProductoWithName(query,db);
-                    Bundle b = new Bundle();
-                    b.putSerializable("Producto", p);
-                    Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
-                    intentViewProduct.putExtras(b);
-                    sv.clearFocus();
-                    startActivity(intentViewProduct);
-
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapterListCom.filter(newText.toString().trim());
-                listView.invalidate();
-                return true;
-            }
-        });
-*/
-
         return true;
     }
 

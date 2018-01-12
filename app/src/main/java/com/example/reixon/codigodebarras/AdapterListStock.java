@@ -27,7 +27,7 @@ import java.util.List;
  */
 
 
- class AdapterListDespensa extends BaseAdapter {
+ class AdapterListStock extends BaseAdapter {
 
     private ArrayList<Producto> searchList;
     private ViewHolder holder = null;
@@ -37,16 +37,17 @@ import java.util.List;
     private SQLiteDatabase db;
     private boolean [] itemChecks;
     private int numChecks;
-    private boolean checkAll;
+    private boolean checkAll,checkState;
 
-    public AdapterListDespensa(Context context, int textViewResourceId,
-                               ArrayList<Producto> listaProductosDada) {
+    public AdapterListStock(Context context, int textViewResourceId,
+                            ArrayList<Producto> listaProductosDada) {
         proList = listaProductosDada;
         searchList = listaProductosDada;
         this.context = (lista_productos) context;
         mysql = new MySQL(context);
         itemChecks = new boolean[listaProductosDada.size()];
         numChecks=0;
+        checkState=false;
         checkAll=false;
     }
 
@@ -66,8 +67,10 @@ import java.util.List;
 
     public void vaciarArrayCheck(){
         itemChecks=new boolean[proList.size()];
+        numChecks=0;
         this.notifyDataSetChanged();
     }
+
 
     public void anyadirProducto(String nombre){
         db = mysql.getWritableDatabase();
@@ -87,16 +90,21 @@ import java.util.List;
         return checkAll;
     }
 
+    public boolean getStateCheckMenu(){
+        return checkState;
+    }
+
+
     public void setCheckAll(){
         if(checkAll){
             checkAll=false;
             numChecks=0;
-            context.setVisibleDelete(false);
+            context.setVisibleMenusActive(false);
         }
         else{
             checkAll=true;
             numChecks=proList.size();
-            context.setVisibleDelete(true);
+            context.setVisibleMenusActive(true);
 
         }
         for(int i=0; i<itemChecks.length;i++){
@@ -104,85 +112,6 @@ import java.util.List;
         }
         notifyDataSetChanged();
     }
-
-    /*    @Override
-        public Filter getFilter() {
-            Filter filter = new Filter(){
-
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    FilterResults results = new FilterResults();
-                    final List<Producto> tempFliteredDataList = new ArrayList<Producto>();
-                    // Logica del filtro
-                    if (constraint == null || constraint.toString().trim().length() == 0) {
-                        results.values=proList;
-                    }
-                    else{
-                        String constrainString = constraint.toString().toLowerCase();
-                        for(Producto postDetail : proList){
-
-                            boolean b = postDetail.getNombre().toLowerCase(Locale.getDefault()).contains(constraint.toString().toLowerCase());
-
-                            if(postDetail.getNombre().toLowerCase(Locale.getDefault()).contains(constraint.toString().toLowerCase()))
-                            {
-                                tempFliteredDataList.add(postDetail);
-                            }
-                        }
-                        results.values = tempFliteredDataList;
-                        db = mysql.getWritableDatabase();
-                        Producto p =mysql.searchProductoWithName(constraint.toString(),db);
-                        if(p!=null){
-                            encuentra=true;
-                        }else {
-                            encuentra = false;
-                        }
-                    }
-
-                    return results;
-                }
-
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    if(results!=null){
-                        searchList = (ArrayList<Producto>) results.values; // returns the filtered list based on the search
-                        notifyDataSetChanged();
-                    }
-                }
-            };
-
-            return filter;
-        }*/
-
-       /* public void filter(String charText){
-            charText = charText.toLowerCase(Locale.getDefault());
-           // Log.d("MyApp"," ****filter******");
-            proList.clear();
-
-            if(charText.length() == 0){
-               // Log.d("MyApp","vacio");
-                proList.addAll(searchList);
-            }else
-            {
-                for(Producto postDetail : searchList){
-                //    Log.d("MyApp","SearchList "+searchList.size());
-                    if(charText.length()!=0 && postDetail.getNombre().toLowerCase(
-                            Locale.getDefault()).contains(charText))
-                    {
-                   //     Log.d("MyApp","Encuentra  Nombre "+postDetail.getNombre());
-                        proList.add(postDetail);
-                        encuentra=false;
-                    }
-                }
-                db = mysql.getWritableDatabase();
-                Producto p =mysql.searchProductoWithName(charText,db);
-                if(p!=null){
-                 //   Log.d("MyApp", "buscamos db "+p.getNombre());
-                    encuentra=true;
-                }
-
-            }
-            notifyDataSetChanged();
-        }*/
 
     private class ViewHolder {
         TextView name;
@@ -235,6 +164,8 @@ import java.util.List;
             holder.check.setChecked(itemChecks[position]);
             holder.check.setTag(position);
 
+
+
             if(p.getRutaImagen().equals("")) {
                 holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
             }
@@ -254,18 +185,31 @@ import java.util.List;
                         Toast.makeText(context, proList.get(position).getNombre(),Toast.LENGTH_SHORT);
 
                         if(numChecks>0) {
-                            context.setVisibleDelete(true);
+                            checkState=false;
+                            context.setVisibleMenusActive(true);
                         }
                     }
                     else {
                         itemChecks[Integer.valueOf(position)]=cb.isChecked();
+                        if(numChecks==proList.size()){
+                            checkState=false;
+                            checkAll=false;
+                            context.invalidateOptionsMenu();
+                        }
                         numChecks--;
+
                         if(numChecks==0){
                             checkAll=false;
-                            context.setVisibleDelete(false);
+                            context.setVisibleMenusActive(false);
+
                         }
                     }
                     cb.setChecked(itemChecks[position]);
+                    if(numChecks==proList.size()){
+                        setCheckAll();
+                        checkState=true;
+                       //ponemos el menu en no visible
+                    }
                 }
             });
         }
