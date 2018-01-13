@@ -92,8 +92,8 @@ public class AdapterListBuyProd extends BaseAdapter {
 
    public void setSuper(SuperMerc sm){
        this.sp = sm;
-       this.proList = sp.getProductos();
-       this.searchList = sp.getProductos();
+       this.proList = new ArrayList<>(sp.getProductos());
+       this.searchList = new ArrayList<>(sp.getProductos());
        this.notifyDataSetChanged();
    }
 

@@ -70,7 +70,7 @@ public class ViewProduct extends AppCompatActivity {
     private RelativeLayout layout;
     private SQLiteDatabase db;
     private MySQL mysql;
-    private boolean photo;
+    private boolean photo, listBuy;
 
 
     @Override
@@ -93,7 +93,7 @@ public class ViewProduct extends AppCompatActivity {
         txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
         etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
         layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
-
+        listBuy=false;
         layout = (RelativeLayout)findViewById(R.id.layout_view_product);
 
         txtPrecioTotal.setVisibility(View.GONE);
@@ -136,12 +136,6 @@ public class ViewProduct extends AppCompatActivity {
 
                 spinnerListaCompra.setAdapter(new ArrayAdapter<String>(this,
                         android.R.layout.simple_list_item_1, arrayNombreSupers));
-                if(b.getBoolean("LISTA_COMPRA")){
-                    layout_cant.setVisibility(View.VISIBLE);
-                }
-                else{
-                    layout_cant.setVisibility(View.GONE);
-                }
             }
             if (b.getSerializable("Producto") != null) {
                 Log.d("MyApp", "Existe un producto desde lista");
@@ -180,6 +174,15 @@ public class ViewProduct extends AppCompatActivity {
                 }
                 txtScan.setVisibility(View.VISIBLE);
                 b.remove("Producto");
+                if(b.getBoolean("LISTA_COMPRA")){
+                    layout_cant.setVisibility(View.VISIBLE);
+                    spinnerListaCompra.setVisibility(View.GONE);
+                    anyadirListaCompra.setVisibility(View.GONE);
+                    listBuy=true;
+                }
+                else{
+                    layout_cant.setVisibility(View.GONE);
+                }
 
             } else if (b.getSerializable("Producto_scanner") != null) {
                 Log.d("MyApp", "Existe un producto desde scanner");
@@ -225,12 +228,40 @@ public class ViewProduct extends AppCompatActivity {
         anyadirListaCompra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db = mysql.getWritableDatabase();
-                mysql.add_Producto_A_Lista_SuperMercado(db,
-                        arraySuper.get(spinnerListaCompra.getSelectedItemPosition()), p);
-                Toast.makeText(ViewProduct.this, "Añadido", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
+                //HashSet<Producto> arrayProdBuy = new HashSet<Producto>(superMerc.getProductos());
+                int num=  arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos().size();
+                ArrayList<Producto> productos = (ArrayList<Producto>)arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos();
+                boolean b=false;
+                if(num>0) {
+                    for (int i = 0; i < num; i++) {
+                        if (productos.get(i).getId() == p.getId()) {
+                            b=true;
+                        }
+                    }
+                }
+                if(!b){
+                    db = mysql.getWritableDatabase();
+                    mysql.add_Producto_A_Lista_SuperMercado(db,
+                            arraySuper.get(spinnerListaCompra.getSelectedItemPosition()), p);
+                    arraySuper = mysql.cargarSuperMercadosBD(db);
+                    Toast.makeText(ViewProduct.this, "Añadido", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                }
+                else{
+                    Toast.makeText(ViewProduct.this, "Ya existe en esa lista", Toast.LENGTH_SHORT).show();
+                }
+
             }
+        });
+
+        spinnerListaCompra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+                superMerc = (SuperMerc)arraySuper.get(spinnerListaCompra.getSelectedItemPosition());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
 
         btPhot.setOnClickListener(new View.OnClickListener() {
@@ -589,12 +620,18 @@ public class ViewProduct extends AppCompatActivity {
                         b=true;
                     }
                     if(b){
-
-                        db = mysql.getWritableDatabase();
-                        mysql.eliminarProducto(p.getId(),db);
-                        Toast.makeText(ViewProduct.this, txtNameProduct.getText().toString()+" eliminado",
-                                Toast.LENGTH_SHORT).show();
-                        setResult(RESULT_OK);
+                        if(listBuy){
+                            //eliminar de la lista
+                            db = mysql.getWritableDatabase();
+                            mysql.eliminar_Producto_D_SuperMerc_Producto(p.getId(),superMerc.getId(),db);
+                            setResult(RESULT_OK);
+                        }else {
+                            db = mysql.getWritableDatabase();
+                            mysql.eliminarProducto(p.getId(), db);
+                            Toast.makeText(ViewProduct.this, txtNameProduct.getText().toString() + " eliminado",
+                                    Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+                        }
                         ViewProduct.this.finish();
                     }
                     else{

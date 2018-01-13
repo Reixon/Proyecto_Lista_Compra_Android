@@ -184,22 +184,49 @@ public class lista_productos extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean [] checks = adapterListPro.getItemCheck();
+                ArrayList<Producto> productos =  arraySupers.get(spinnerSupers.getSelectedItemPosition()).getProductos();
+                int numP= productos.size();
+                String nombre="";
+                boolean b= false;
                 for(int i = 0; i< checks.length; i++) {
                     if(checks[i]) {
-                        db = mysql.getWritableDatabase();
-                        mysql.add_Producto_A_Lista_SuperMercado(db,
-                                arraySupers.get(spinnerSupers.getSelectedItemPosition()),
-                                productoTotal.get(i));
-                        arraySupers.get(
-                                spinnerSupers.getSelectedItemPosition()).
-                                addProduct(productoTotal.get(i));
-                        //addProductListSuper(searchList.get(ArrayCheck[i].getPosition()));
+                        if(numP>0){
+                            for(int x=0;x<numP; x++) {
+                                if (productos.get(x).getId() != productoTotal.get(i).getId()) {
+
+                                } else {
+                                    nombre += productoTotal.get(i).getNombre() + ", ";
+                                    b = true;
+                                    break;
+                                }
+                            }
+                            if(b==false){
+                                db = mysql.getWritableDatabase();
+                                mysql.add_Producto_A_Lista_SuperMercado(db,
+                                        arraySupers.get(spinnerSupers.getSelectedItemPosition()),
+                                        productoTotal.get(i));
+                                arraySupers.get(spinnerSupers.getSelectedItemPosition()).
+                                        addProduct(productoTotal.get(i));
+                            }
+                        }else{
+                            db = mysql.getWritableDatabase();
+                            mysql.add_Producto_A_Lista_SuperMercado(db,
+                                    arraySupers.get(spinnerSupers.getSelectedItemPosition()),
+                                    productoTotal.get(i));
+                            arraySupers.get(spinnerSupers.getSelectedItemPosition()).
+                                    addProduct(productoTotal.get(i));
+                        }
                     }
                 }
                 setVisibleMenusActive(false);
                 adapterListPro.vaciarArrayCheck();
 
-                Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
+                if(b){
+                    Toast.makeText(lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

@@ -148,7 +148,8 @@ public class lista_compra extends AppCompatActivity{
             //    delete.setVisible(false);
                 Bundle b = new Bundle();
                 b.putSerializable("Producto", p);
-                b.putSerializable("Lista Supers", arraySupers);
+                //b.putSerializable("Lista Supers", arraySupers);
+                b.putSerializable("SuperMerc",arraySupers.get(spinner_super.getSelectedItemPosition()));
                 b.putBoolean("LISTA_COMPRA",true);
                 Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
                 intentViewProduct.putExtras(b);
