@@ -1,6 +1,7 @@
 package com.example.reixon.codigodebarras;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,18 +11,46 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Adapter_categories_expanable extends BaseExpandableListAdapter {
-    private Context mcontext;
+ /*   private Context mcontext;
     private ArrayList<Category> mCategories;
+    private LayoutInflater mInflater;*/
+    private Context mcontext;
     private LayoutInflater mInflater;
+    private ArrayList<Category> mCategories;
+    private ArrayList<Producto> searchList;
+    private ViewHolder holder = null;
+    private List<Producto> proList;
+    private MySQL mysql;
+    private SQLiteDatabase db;
+    private boolean [] itemChecks;
+    private int numChecks;
+    private boolean checkAll,checkState;
 
     public Adapter_categories_expanable(Context context, ArrayList<Category> groups) {
         this.mcontext = context;
         mCategories = groups;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        //proList = listaProductosDada;
+        //searchList = listaProductosDada;
+        mysql = new MySQL(context);
+        //itemChecks = new boolean[listaProductosDada.size()];
+        numChecks=0;
+        checkState=false;
+        checkAll=false;
     }
 
+
+    private class ViewHolder {
+        TextView name;
+        ImageView imagen;
+        TextView precio;
+        CheckBox check;
+        TextView cantidad;
+    }
 
     @Override
     public int getGroupCount() {

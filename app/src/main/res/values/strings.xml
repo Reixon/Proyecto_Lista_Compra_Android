@@ -12,7 +12,11 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_settings">Settings</string>
     <string name="buttonAdminList">Crear lista</string>
-
+    <string name="etPrecioTotal">Precio Total: </string>
+    <string name="etNumPro">Número elementos: </string>
+    <string name="etAnyadir">Añadir</string>
+    <string name="etEuro"> € </string>
+    <string name="descriptionBtOk">Añadir producto</string>
 
     <!--menu_product-->
     <string name="Aceptar">Aceptar</string>

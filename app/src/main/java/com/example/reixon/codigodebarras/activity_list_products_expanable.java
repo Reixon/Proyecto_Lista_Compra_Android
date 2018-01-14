@@ -34,14 +34,17 @@ public class activity_list_products_expanable extends AppCompatActivity {
     }
 
     public ArrayList<Category> prepareData(ArrayList<Producto> allProd,  ArrayList<Category> cate){
+        ArrayList<Category> aux = new ArrayList<Category>();
+        aux.addAll(cate);
         for(int i=0; i<cate.size(); i++){
 
             for(int x = 0; x<allProd.size(); x++){
                 if(allProd.get(x).getCategoria()==cate.get(i).getId()){
-                    cate.get(i).addProductCategory(allProd.get(x));
+                    aux.get(i).addProductCategory(allProd.get(x));
+                    //cate.get(i).addProductCategory(allProd.get(x));
                 }
             }
         }
-        return cate;
+        return aux;
     }
 }

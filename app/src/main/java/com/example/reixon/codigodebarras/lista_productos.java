@@ -48,7 +48,7 @@ public class lista_productos extends AppCompatActivity {
     private boolean encuentra,filterOn;
     private MenuItem delete, checkAll; //searchItem
     private Button anyadirListBuy;
-    private ImageButton bt_speak, btCode, btOk;
+    private ImageButton bt_speak, btCode,btOk,btCross;
     private Spinner spinnerSupers;
     private SearchView sv;
     protected MySQL mysql;
@@ -63,14 +63,13 @@ public class lista_productos extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.full_productos_stock);
-       // encuentra=false;
         anyadirListBuy =(Button)findViewById(R.id.bt_anyadir_listaCompra);
         spinnerSupers =(Spinner)findViewById(R.id.spinner_listSuper);
         bt_speak =(ImageButton)findViewById(R.id.bt_speak);
         txt_edit =(EditText)findViewById(R.id.txt_lista_productos);
         btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
         btOk = (ImageButton)findViewById(R.id.bt_ok_menu_search);
-
+        btCross =(ImageButton)findViewById(R.id.bt_cross_menu_search);
 
         txt_edit.clearFocus();
         txt_edit.setSingleLine();
@@ -89,6 +88,22 @@ public class lista_productos extends AppCompatActivity {
         this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
         Toast.makeText(this, "La pantalla se mantendrá encendida hasta pasar de pantalla.", Toast.LENGTH_SHORT).show();
         wakelock.acquire();
+
+
+        Bundle b = getIntent().getExtras();
+        if(b!=null) {
+            arraySupers = (ArrayList<SuperMerc>) b.getSerializable("Lista Supers");
+            productoTotal = (ArrayList<Producto>)b.getSerializable("Full Products");
+            arrayCategories =(ArrayList<Category>) b.getSerializable("Array Categories");
+        }
+
+        listaSuperNombre = new ArrayList<String>();
+        for (int i = 0; i < arraySupers.size(); i++) {
+            listaSuperNombre.add(arraySupers.get(i).getNombre());
+        }
+
+        spinnerSupers.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, listaSuperNombre));
 
         bt_speak.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,21 +124,14 @@ public class lista_productos extends AppCompatActivity {
             }
         });
 
-
-        Bundle b = getIntent().getExtras();
-        if(b!=null) {
-            arraySupers = (ArrayList<SuperMerc>) b.getSerializable("Lista Supers");
-            productoTotal = (ArrayList<Producto>)b.getSerializable("Full Products");
-            arrayCategories =(ArrayList<Category>) b.getSerializable("Array Categories");
-        }
-
-        listaSuperNombre = new ArrayList<String>();
-        for (int i = 0; i < arraySupers.size(); i++) {
-            listaSuperNombre.add(arraySupers.get(i).getNombre());
-        }
-
-        spinnerSupers.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, listaSuperNombre));
+        btCross.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(v.getId()==R.id.bt_cross_menu_search){
+                    txt_edit.setText("");
+                }
+            }
+        });
 
         btCode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,34 +155,10 @@ public class lista_productos extends AppCompatActivity {
 
                 if((keyCode == KeyEvent.KEYCODE_ENTER)&& event.getAction()== KeyEvent.ACTION_DOWN){
                         EditText txt = (EditText)v;
-                //    if (encuentra==false || productoTotal.size() == 0) {
-                        /*Intent intentAddProducto = new Intent(activity_lista_productos.this, Add_product.class);
-                        Bundle b = new Bundle();
-                        b.putString("AddProducto", txt.getText().toString());
-                        intentAddProducto.putExtras(b);
+                        String nombre = txt.getText().toString();
+                        adapterListPro.anyadirProducto(nombre);
                         txt.clearFocus();
                         txt.setText("");
-                        startActivity(intentAddProducto);*/
-                    String nombre = txt.getText().toString();
-                    adapterListPro.anyadirProducto(nombre);
-                    txt.clearFocus();
-                    txt.setText("");
-                       // encuentra=false;
-                /*    }
-                    else if(encuentra==true){
-                        db = mysql.getWritableDatabase();
-                        Producto p =mysql.searchProductoWithName(txt.getText().toString(),db);
-                        Bundle b = new Bundle();
-                        b.putSerializable("Producto", p);
-                        Intent intentViewProduct= new Intent(activity_lista_productos.this, ViewProduct.class);
-                        intentViewProduct.putExtras(b);
-                        txt.clearFocus();
-                        txt.setText("");
-                        encuentra=false;
-                        startActivity(intentViewProduct);
-
-
-                    }*/
                 }
                 return false;
             }
@@ -183,32 +167,24 @@ public class lista_productos extends AppCompatActivity {
         anyadirListBuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean [] checks = adapterListPro.getItemCheck();
-                ArrayList<Producto> productos =  arraySupers.get(spinnerSupers.getSelectedItemPosition()).getProductos();
-                int numP= productos.size();
-                String nombre="";
-                boolean b= false;
-                for(int i = 0; i< checks.length; i++) {
-                    if(checks[i]) {
-                        if(numP>0){
-                            for(int x=0;x<numP; x++) {
-                                if (productos.get(x).getId() != productoTotal.get(i).getId()) {
+            boolean [] checks = adapterListPro.getItemCheck();
+            ArrayList<Producto> productos =  arraySupers.get(spinnerSupers.getSelectedItemPosition()).getProductos();
+            int numP= productos.size();
+            String nombre="";
+            boolean b= false;
+            for(int i = 0; i< checks.length; i++) {
+                if(checks[i]) {
+                    if(numP>0){
+                        for(int x=0;x<numP; x++) {
+                            if (productos.get(x).getId() != productoTotal.get(i).getId()) {
 
-                                } else {
-                                    nombre += productoTotal.get(i).getNombre() + ", ";
-                                    b = true;
-                                    break;
-                                }
+                            } else {
+                                nombre += productoTotal.get(i).getNombre() + ", ";
+                                b = true;
+                                break;
                             }
-                            if(b==false){
-                                db = mysql.getWritableDatabase();
-                                mysql.add_Producto_A_Lista_SuperMercado(db,
-                                        arraySupers.get(spinnerSupers.getSelectedItemPosition()),
-                                        productoTotal.get(i));
-                                arraySupers.get(spinnerSupers.getSelectedItemPosition()).
-                                        addProduct(productoTotal.get(i));
-                            }
-                        }else{
+                        }
+                        if(b==false){
                             db = mysql.getWritableDatabase();
                             mysql.add_Producto_A_Lista_SuperMercado(db,
                                     arraySupers.get(spinnerSupers.getSelectedItemPosition()),
@@ -216,17 +192,26 @@ public class lista_productos extends AppCompatActivity {
                             arraySupers.get(spinnerSupers.getSelectedItemPosition()).
                                     addProduct(productoTotal.get(i));
                         }
+                    }else{
+                        db = mysql.getWritableDatabase();
+                        mysql.add_Producto_A_Lista_SuperMercado(db,
+                                arraySupers.get(spinnerSupers.getSelectedItemPosition()),
+                                productoTotal.get(i));
+                        arraySupers.get(spinnerSupers.getSelectedItemPosition()).
+                                addProduct(productoTotal.get(i));
                     }
                 }
-                setVisibleMenusActive(false);
-                adapterListPro.vaciarArrayCheck();
+            }
+            setVisibleMenusActive(false);
+            adapterListPro.vaciarArrayCheck();
 
-                if(b){
-                    Toast.makeText(lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
-                }
+            if(b){
+                Toast.makeText(lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+            }
             }
         });
 
@@ -247,13 +232,16 @@ public class lista_productos extends AppCompatActivity {
                 }
                 if(!s.toString().equals("")){
                     btOk.setVisibility(View.VISIBLE);
+                    btCross.setVisibility(View.VISIBLE);
                     bt_speak.setVisibility(View.GONE);
                     btCode.setVisibility(View.GONE);
                 }
                 else {
                     btOk.setVisibility(View.GONE);
+                    btCross.setVisibility(View.GONE);
                     bt_speak.setVisibility(View.VISIBLE);
                     btCode.setVisibility(View.VISIBLE);
+
                 }
             }
             @Override

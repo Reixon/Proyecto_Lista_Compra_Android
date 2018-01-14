@@ -12,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -94,6 +93,8 @@ public class AdapterListBuyProd extends BaseAdapter {
        this.sp = sm;
        this.proList = new ArrayList<>(sp.getProductos());
        this.searchList = new ArrayList<>(sp.getProductos());
+       itemChecks = new boolean[proList.size()];
+       numChecks=0;
        this.notifyDataSetChanged();
    }
 
@@ -152,8 +153,6 @@ public class AdapterListBuyProd extends BaseAdapter {
                     if(cb.isChecked()) {
                         itemChecks[Integer.valueOf(position)]=cb.isChecked();
                         numChecks++;
-                        Toast.makeText(context, proList.get(position).getNombre(),Toast.LENGTH_SHORT);
-
                         if(numChecks>0) {
                             context.setVisibleDelete(true);
                         }

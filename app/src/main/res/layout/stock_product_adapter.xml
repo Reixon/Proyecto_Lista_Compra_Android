@@ -10,7 +10,7 @@
             android:id="@+id/imagenListProductos"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_margin="10dp"
             android:src="@drawable/photo_icon" />
 
@@ -20,9 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/imagenListProductos"
             android:layout_toEndOf="@+id/imagenListProductos"
-            android:ems="25"
+            android:ems="40"
             android:maxLines="1"
-            android:text="nombre"
             android:textAlignment="viewStart"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -35,6 +34,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/nombre"
             android:focusable="false"
+            android:layout_marginEnd="10dp"
             android:focusableInTouchMode="false" />
 
         <TextView
@@ -44,7 +44,6 @@
             android:layout_below="@+id/nombre"
             android:layout_toEndOf="@+id/txtMoneda"
             android:maxLength="10"
-            android:text="precio"
             android:textAlignment="textStart" />
 
         <TextView
@@ -54,15 +53,17 @@
             android:layout_alignBaseline="@+id/txt_precio_prod"
             android:layout_alignBottom="@+id/txt_precio_prod"
             android:layout_alignStart="@+id/nombre"
-            android:text=" € " />
+            android:text="@string/etEuro" />
 
         <TextView
             android:id="@+id/txtCantidad"
-            android:layout_width="wrap_content"
+            android:layout_width="10dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/nombre"
             android:layout_alignBottom="@+id/nombre"
+            android:layout_alignTop="@+id/nombre"
             android:layout_toEndOf="@+id/nombre"
+            android:layout_toStartOf="@+id/etcheckBox"
+            android:ems="15"
             android:text="(1)"
             android:textSize="14sp"
             android:textStyle="bold" />

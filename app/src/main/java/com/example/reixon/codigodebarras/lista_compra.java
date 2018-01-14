@@ -102,7 +102,6 @@ public class lista_compra extends AppCompatActivity{
         spinner_super.setSelection(0);
         sp = (SuperMerc)arraySupers.get(spinner_super.getSelectedItemPosition());
 
-
         this.listaProductosCompra = sp.getProductos();
         adapterListCom = new AdapterListBuyProd(this,R.layout.stock_product_adapter,
                 listaProductosCompra);
@@ -114,28 +113,6 @@ public class lista_compra extends AppCompatActivity{
         }
         spinner_super.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, arrayNombreSupers));
-
-    /*
-            // listaProductosCompra = ordenadrYAnyadirCategoria();
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
-            drawer.setDrawerListener(toggle);
-            toggle.syncState();
-
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });*/
 
         //LISTENERS
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

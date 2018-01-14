@@ -1,26 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@android:color/background_light">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp"
+    android:background="@android:color/background_light">
 
         <EditText
             android:id="@+id/txt_lista_productos"
             android:layout_width="match_parent"
             android:layout_height="51dp"
-            android:layout_marginRight="100dp"
             android:background="@android:color/background_light"
             android:ems="25"
             android:focusableInTouchMode="true"
-            android:hint="Añadir Producto"
+            android:hint="@string/descriptionBtOk"
             android:inputType="textCapSentences"
-            android:paddingRight="5dp"
             android:text=""
             android:textColor="@android:color/black"
             android:textColorHighlight="@color/zxing_viewfinder_mask"
@@ -33,26 +29,36 @@
             android:layout_height="50dp"
             android:layout_gravity="end|center_vertical"
             android:background="@android:color/background_light"
-            android:visibility="gone"
+            android:contentDescription="@string/descriptionBtOk"
+            android:layout_marginEnd="50dp"
             app:srcCompat="@drawable/icon_ok" />
 
         <ImageButton
-            android:id="@+id/bt_speak"
-            app:srcCompat="@android:drawable/ic_btn_speak_now"
+            android:id="@+id/bt_scanner_search"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="end|center_vertical"
-            android:background="@android:color/background_light" />
+            android:layout_marginEnd="50dp"
+            android:background="@android:color/background_light"
+            app:srcCompat="@drawable/icon_codebar" />
 
         <ImageButton
-            android:id="@+id/bt_scanner_search"
-            app:srcCompat="@drawable/icon_codebar"
+            android:id="@+id/bt_cross_menu_search"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginRight="50dp"
-            android:background="@android:color/background_light" />
-    </FrameLayout>
+            android:background="@android:color/background_light"
+
+            app:srcCompat="@drawable/icon_cross" />
+
+        <ImageButton
+            android:id="@+id/bt_speak"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end|center_vertical"
+            android:background="@android:color/background_light"
+            app:srcCompat="@android:drawable/ic_btn_speak_now" />
 
 
-</LinearLayout>
+
+</FrameLayout>

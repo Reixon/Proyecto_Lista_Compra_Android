@@ -74,14 +74,12 @@ import java.util.List;
 
     public void anyadirProducto(String nombre){
         db = mysql.getWritableDatabase();
-        mysql.addProducto(nombre, "0","","",-1,0,db);
+        mysql.addProducto(nombre, "0","","",1,0,db);
         db = mysql.getWritableDatabase();
         context.setProductosTotales(mysql.loadFullProduct(db));
         proList = context.getProductosTotales();
         searchList = context.getProductosTotales();
         itemChecks = new boolean[proList.size()];
-        //Producto p = context.getProductosTotales().get(context.getProductosTotales().size()-1);
-
         Toast.makeText(context, nombre +" creado", Toast.LENGTH_SHORT).show();
         this.notifyDataSetChanged();
     }
