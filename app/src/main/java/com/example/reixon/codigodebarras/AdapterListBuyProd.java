@@ -37,14 +37,14 @@ public class AdapterListBuyProd extends BaseAdapter {
     private boolean checkAll;
 
     public AdapterListBuyProd(Context context,
-            int textViewResourceId, ArrayList<Producto> listaProductosDada) {
+            int textViewResourceId, ArrayList<Producto> listaProductosDada,SuperMerc sp) {
         this.context = (lista_compra) context;
         proList = listaProductosDada;
         searchList = listaProductosDada;
         itemChecks = new boolean[listaProductosDada.size()];
         numChecks=0;
         mysql = new MySQL(context);
-        sp = this.context.getSuperMerc();
+        this.sp = sp;
     }
 
     /*public void vaciarArrayCheck(){
@@ -62,7 +62,7 @@ public class AdapterListBuyProd extends BaseAdapter {
         if(checkAll){
             checkAll=false;
             numChecks=0;
-            context.setVisibleDelete(false);
+           // context.setVisibleDelete(false);
         }
         else{
             checkAll=true;
@@ -154,7 +154,7 @@ public class AdapterListBuyProd extends BaseAdapter {
                         itemChecks[Integer.valueOf(position)]=cb.isChecked();
                         numChecks++;
                         if(numChecks>0) {
-                            context.setVisibleDelete(true);
+                           // context.setVisibleDelete(true);
                         }
                     }
                     else {
@@ -162,7 +162,7 @@ public class AdapterListBuyProd extends BaseAdapter {
                         numChecks--;
                         if(numChecks==0){
                             checkAll=false;
-                            context.setVisibleDelete(false);
+                            //context.setVisibleDelete(false);
                         }
                     }
                     cb.setChecked(itemChecks[position]);
@@ -176,16 +176,9 @@ public class AdapterListBuyProd extends BaseAdapter {
 
     private class loadImage extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageRef;
-        //private ProgressDialog dialog;
         private loadImage(ImageView imageRef) {
             this.imageRef = new WeakReference<ImageView>(imageRef);
-            //        dialog = new ProgressDialog(activity);
         }
-    /*    @Override
-        protected void onPreExecute(){
-            dialog.setMessage("Cargando. Espere por favor.");
-            dialog.show();
-        }*/
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -194,8 +187,6 @@ public class AdapterListBuyProd extends BaseAdapter {
             try {
                 ims = new FileInputStream(params[0]);
                 image = BitmapFactory.decodeStream(ims);
-                    /*    Bitmap imageResize = Bitmap.createScaledBitmap(image,
-                                50, 50, true);*/
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -203,9 +194,6 @@ public class AdapterListBuyProd extends BaseAdapter {
         }
 
         protected void onPostExecute(Bitmap image){
-         /*   if (dialog.isShowing()) {
-                dialog.dismiss();
-            }*/
             ImageView imageView = imageRef.get();
             imageView.setImageBitmap(image);
         }

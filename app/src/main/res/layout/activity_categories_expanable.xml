@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="0.10"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ExpandableListView
         android:id="@+id/expanable_listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</android.widget.LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout"/>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/holo_green_light"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <Spinner
+            android:id="@+id/spinner_listSuper"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"></Spinner>
+
+        <Button
+            android:id="@+id/bt_anyadir_listaCompra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/etAnyadir" />
+    </LinearLayout>
+
+</RelativeLayout>
 

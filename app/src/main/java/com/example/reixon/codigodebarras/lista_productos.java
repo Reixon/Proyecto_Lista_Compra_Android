@@ -45,8 +45,6 @@ public class lista_productos extends AppCompatActivity {
     private ArrayList<Producto>productoTotal;
     private ArrayList<Category>arrayCategories;
     private ListView listView = null;
-    private boolean encuentra,filterOn;
-    private MenuItem delete, checkAll; //searchItem
     private Button anyadirListBuy;
     private ImageButton bt_speak, btCode,btOk,btCross;
     private Spinner spinnerSupers;
@@ -56,7 +54,6 @@ public class lista_productos extends AppCompatActivity {
     private boolean loadData, menu_active;
     private static final int LOAD_DATA_MYSQL=100;
     protected PowerManager.WakeLock wakelock;
-
     private EditText txt_edit;
 
     @Override
@@ -74,7 +71,6 @@ public class lista_productos extends AppCompatActivity {
         txt_edit.clearFocus();
         txt_edit.setSingleLine();
         txt_edit.setHorizontallyScrolling(true);
-        filterOn=false;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Despensa");
         setSupportActionBar(toolbar);
@@ -184,7 +180,7 @@ public class lista_productos extends AppCompatActivity {
                                 break;
                             }
                         }
-                        if(b==false){
+                        if(!b){
                             db = mysql.getWritableDatabase();
                             mysql.add_Producto_A_Lista_SuperMercado(db,
                                     arraySupers.get(spinnerSupers.getSelectedItemPosition()),
@@ -223,7 +219,6 @@ public class lista_productos extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-               // adapterListPro.getFilter().filter(s.toString().trim());
                 if(spinnerSupers.getVisibility()==View.VISIBLE && anyadirListBuy.getVisibility()==View.VISIBLE) {
                     spinnerSupers.setVisibility(View.GONE);
                     anyadirListBuy.setVisibility(View.GONE);
@@ -394,7 +389,7 @@ public class lista_productos extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.main_menu_products, menu);
+        getMenuInflater().inflate(R.menu.menu_list_products, menu);
 
         return true;
     }
@@ -442,19 +437,16 @@ public class lista_productos extends AppCompatActivity {
                         dialogClick).setNegativeButton("No",dialogClick).show();
             return true;
             case R.id.action_settings:
+                Intent i = new Intent(lista_productos.this, SettingsActivity.class);
+                startActivity(i);
                 Toast.makeText(lista_productos.this,"opciones",Toast.LENGTH_SHORT);
                 return true;
-            case R.id.share_products:
-                createFileJSON();
-                Toast.makeText(lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
-                return true;
-            case R.id.download_products:
 
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -472,7 +464,7 @@ public class lista_productos extends AppCompatActivity {
         }
         else{
             menu.clear();
-            getMenuInflater().inflate(R.menu.main_menu_products, menu);
+            getMenuInflater().inflate(R.menu.menu_list_products, menu);
 
         }
 

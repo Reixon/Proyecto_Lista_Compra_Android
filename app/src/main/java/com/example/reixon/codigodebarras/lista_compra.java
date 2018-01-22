@@ -1,6 +1,5 @@
 package com.example.reixon.codigodebarras;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -44,12 +42,8 @@ public class lista_compra extends AppCompatActivity{
     private ArrayList<Category> arrayCategories;
     private ArrayList<SuperMerc>arraySupers;
     private ArrayList<Producto>productoTotal;
-    private ListView listView = null;
-    private MenuItem delete, searchItem, compartir;
+    private ListView listView;
     private Spinner spinner_super;
-    private ImageButton edit_listaSuper;
-    private boolean encuentra;
-    private int unidadSelec;
     private ImageButton bt_speak, btCode, btOk;
     private SuperMerc sp;
     private TextView numElement,txtPrecioT;
@@ -67,7 +61,6 @@ public class lista_compra extends AppCompatActivity{
         final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
         txt_edit =(EditText)findViewById(R.id.txt_lista_productos);
         spinner_super = (Spinner)findViewById(R.id.spinner_super);
-        edit_listaSuper =(ImageButton)findViewById(R.id.bt_edit_listaSuper);
         txtPrecioT = (TextView)findViewById(R.id.txtPrecioTotal);
         numElement = (TextView)findViewById(R.id.txtNumProd);
         bt_speak =(ImageButton)findViewById(R.id.bt_speak);
@@ -97,15 +90,14 @@ public class lista_compra extends AppCompatActivity{
                 arrayCategories =(ArrayList<Category>) b.getSerializable("Array Categories");
             }
         }
-       // db = mysql.getWritableDatabase();
-     //   this.arraySupers = mysql.cargarSuperMercadosBD(db);
         spinner_super.setSelection(0);
         sp = (SuperMerc)arraySupers.get(spinner_super.getSelectedItemPosition());
 
         this.listaProductosCompra = sp.getProductos();
         adapterListCom = new AdapterListBuyProd(this,R.layout.stock_product_adapter,
-                listaProductosCompra);
+                listaProductosCompra,sp);
         listView.setAdapter(adapterListCom);
+
 
         arrayNombreSupers = new ArrayList<String>();
         for(int i = 0; i< arraySupers.size(); i++) {
@@ -121,11 +113,8 @@ public class lista_compra extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View v, int pos,
                                     long id) {
                 Producto p = listaProductosCompra.get(pos);
-                SuperMerc superM =  arraySupers.get(spinner_super.getSelectedItemPosition());
-            //    delete.setVisible(false);
                 Bundle b = new Bundle();
                 b.putSerializable("Producto", p);
-                //b.putSerializable("Lista Supers", arraySupers);
                 b.putSerializable("SuperMerc",arraySupers.get(spinner_super.getSelectedItemPosition()));
                 b.putBoolean("LISTA_COMPRA",true);
                 Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
@@ -202,46 +191,8 @@ public class lista_compra extends AppCompatActivity{
             }
         });
 
-        edit_listaSuper.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(lista_compra.this);
-                builder.setTitle("Añadir lista de compra");
-
-                final EditText edit = new EditText(lista_compra.this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
-                edit.setLayoutParams(lp);
-                builder.setView(edit);
-
-                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        db = mysql.getWritableDatabase();
-                        SuperMerc lS = new SuperMerc(edit.getText().toString(), 0, 0);
-                        mysql.addSuper(db, lS);
-                        arraySupers.add(lS);
-                        arrayNombreSupers.add(lS.getNombre());
-                        spinner_super.setAdapter(new ArrayAdapter<String>(lista_compra.this,
-                                android.R.layout.simple_list_item_1, arrayNombreSupers));
-                    }
-                });
-
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
-
-            }
-
-        });
-
         spinner_super.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
 
@@ -278,6 +229,8 @@ public class lista_compra extends AppCompatActivity{
             adapterListCom.setSuper(sp);
             loadData=false;
         }
+
+        listView.setEmptyView(findViewById(R.id.text_list_empty));
         actualizarPrecioYelementos();
 
 
@@ -367,12 +320,6 @@ public class lista_compra extends AppCompatActivity{
         wakelock.release();
     }
 
-    public SuperMerc getSuperMerc(){
-        return sp;
-    }
-
-
-
     public void deleteProductCheck(){
         int posSig;
         String nombres="";
@@ -386,8 +333,6 @@ public class lista_compra extends AppCompatActivity{
         }
         adapterListCom.setList(sp.getProductos());
         Toast.makeText(this, nombres + " eliminados", Toast.LENGTH_SHORT).show();
-        this.delete.setVisible(false);
-
         adapterListCom.notifyDataSetChanged();
     }
 
@@ -399,10 +344,10 @@ public class lista_compra extends AppCompatActivity{
         return true;
     }
 
-    public void setVisibleDelete(Boolean b){
+ /*   public void setVisibleDelete(Boolean b){
         menu_active=b;
         invalidateOptionsMenu();
-    }
+    }*/
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -423,6 +368,8 @@ public class lista_compra extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case R.id.drawer_layout:
+                return true;
             case R.id.checkAll:
                 adapterListCom.setCheckAll();
                 break;
@@ -444,25 +391,49 @@ public class lista_compra extends AppCompatActivity{
                 Toast.makeText(lista_compra.this,"opciones",Toast.LENGTH_SHORT);
                 return true;
             case R.id.share_list:
-                createFileJSON();
+                chooseShared();
+
+                //Toast.makeText(lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void chooseShared(){
+        final CharSequence [] option ={"Enviar", "Enviar como texto"};
+        final android.app.AlertDialog.Builder builder =
+                new android.app.AlertDialog.Builder(lista_compra.this);
+        builder.setTitle("Selecciona una opcion");
+        builder.setItems(option, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent;
+                switch(which){
+                    case 0:
+                        Intent i = new Intent(lista_compra.this,Shared_option_list.class);
+                        startActivity(i);
+                        break;
+                    case 1:
+                        createFileJSON();
+                        break;
+                    case 2:
+
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 
     private void createFileJSON(){
         JSONObject superJSON = convertArrayTOJSON();
         Writer output = null;
         try {
-        /*    File dirImg = new ContextWrapper(getApplicationContext()).getDir("Archivos", Context.MODE_APPEND);
-            File file = new File(dirImg, "listShare.json");
-            output = new BufferedWriter(new FileWriter(file));
-            output.write(superJSON.toString());
-            output.close();*/
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TITLE,"lista compra JSON");
-            sendIntent.putExtra(Intent.EXTRA_TEXT, superJSON.toString());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "text/plain");
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
             Toast.makeText(lista_compra.this,"Datos compartidos",Toast.LENGTH_SHORT);
@@ -516,7 +487,6 @@ public class lista_compra extends AppCompatActivity{
             total +=listaProductosCompra.get(i).getPrecio()*
                     listaProductosCompra.get(i).getCantidad();
         }
-
         int numP = sp.getNumProductosParaComprar();
         numElement.setText(Integer.toString(numP));
         txtPrecioT.setText(total+" € ");

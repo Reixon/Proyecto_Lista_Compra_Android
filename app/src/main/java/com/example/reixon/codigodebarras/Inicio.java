@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 public class Inicio extends AppCompatActivity {
     private SQLiteDatabase db;
     private MySQL mysql;
-    private ImageButton btStock, btStock2, btListaCompra, btScanner;
+    private ImageButton btStock, btStock2, btListaCompra, btScanner,btConnection;
     private ArrayList<SuperMerc>arraySupers;
     private ArrayList<Producto>productoTotal;
     private ArrayList<Category>arrayCategories;
@@ -38,9 +38,10 @@ public class Inicio extends AppCompatActivity {
         toolbar.setTitle("My List Shop");
         setSupportActionBar(toolbar);
         btStock = (ImageButton)findViewById(R.id.btStock);
-        btStock2 = (ImageButton)findViewById(R.id.btStock2);
+        btStock2 = (ImageButton)findViewById(R.id.btStockPrueba);
         btListaCompra =(ImageButton)findViewById(R.id.btListaCompra);
         btScanner = (ImageButton)findViewById(R.id.btScanner);
+        btConnection =(ImageButton)findViewById(R.id.btConnection);
 
         mysql = new MySQL(this);
      /*   db = mysql.getWritableDatabase();
@@ -53,8 +54,12 @@ public class Inicio extends AppCompatActivity {
         btStock2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Bundle b = new Bundle();
+                b.putSerializable("Lista Supers", arraySupers);
+                b.putSerializable("Full Products", productoTotal);
+                b.putSerializable("Array Categories", arrayCategories);
                 Intent i = new Intent(Inicio.this, activity_list_products_expanable.class);
+                i.putExtras(b);
                 startActivity(i);
             }
         });
@@ -101,9 +106,6 @@ public class Inicio extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
-
-
     }
 
     @Override
@@ -203,4 +205,5 @@ public class Inicio extends AppCompatActivity {
         }
 
     }
+
 }

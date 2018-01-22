@@ -11,10 +11,6 @@
         android:title="@string/Administrar_lista"
         app:showAsAction="never" />
     <item
-        android:id="@+id/remove_list"
-        android:title="@string/Eliminar_lista"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/share_list"
         android:title="@string/action_share_buy_list"
         app:showAsAction="never" />

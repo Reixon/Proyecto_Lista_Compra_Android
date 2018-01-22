@@ -28,10 +28,10 @@ dependencies {
     })
     //compile 'dk.schaumburgit.fast-barcode-scanner:fast-barcode-scanner:1.0.2'
     compile 'com.loopj.android:android-async-http:1.4.9'
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
     compile 'com.google.zxing:core:3.2.1'
     compile 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:design:25.4.0'
     testCompile 'junit:junit:4.12'
 }

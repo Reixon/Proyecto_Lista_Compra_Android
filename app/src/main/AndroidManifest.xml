@@ -12,6 +12,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Permiso para uso de internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -42,6 +48,12 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity_list_products_expanable"
+            android:label="@string/title_activity_stock_product"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".Add_product"
             android:screenOrientation="portrait" />
         <activity
@@ -58,11 +70,20 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity_list_products_expanable" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".Admin_list"></activity>
+        <activity android:name=".Admin_list" />
+        <activity android:name=".Shared_option_list" />
+        <activity android:name=".NewAcount" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" />
+        <activity android:name=".CreateUser" />
+        <activity
+            android:name=".menu_navigate"
+            android:label="@string/title_activity_menu_navigate"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
