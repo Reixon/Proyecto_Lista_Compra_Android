@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.reixon.codigodebarras.Shared_option_list"
+    tools:context="com.example.reixon.codigodebarras.ui.Shared_option_list"
     tools:layout_editor_absoluteY="81dp">
 
     <ListView

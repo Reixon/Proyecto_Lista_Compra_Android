@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.reixon.codigodebarras.NewAcount">
+    tools:context="com.example.reixon.codigodebarras.ui.NewAcount">
 
     <TextView
         android:id="@+id/textView"
@@ -12,8 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="Añadir nueva cuenta"
         android:paddingStart="10dp"
+        android:text="Añadir nueva cuenta"
+        android:textAlignment="center"
         android:textColor="@android:color/background_dark"
         android:textSize="24sp"
         android:textStyle="bold" />

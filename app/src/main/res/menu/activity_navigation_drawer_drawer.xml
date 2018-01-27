@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item android:title="Menú">
+        <menu>
+            <item
+                android:id="@+id/nav_listBuy"
+                android:icon="@drawable/ic_assignment_48px"
+                android:title="Listas" />
+            <item
+                android:id="@+id/nav_listProd"
+                android:icon="@drawable/ic_shopping_basket_48px"
+                android:title="Productos" />
+            <item
+                android:id="@+id/nav_categories"
+                android:icon="@drawable/ic_list_48px"
+                android:title="Categorias" />
+            <item
+                android:id="@+id/nav_history"
+                android:icon="@drawable/ic_history_48px"
+                android:title="Historial de compras" />
+        </menu>
+    </item>
+    <!--<item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                andric_lauchericon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                andric_lauchericon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>-->
+    <item android:title="Opciones">
+        <menu>
+            <item android:title="Cuentas"
+                android:icon="@drawable/ic_account_circle_48px"
+                android:id="@+id/nav_account"
+                />
+            <item
+                android:title="Ajustes"
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/settings"
+                />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_outline_48px"
+                android:title="Acerca de" />
+        </menu>
+    </item>
+
+
+
+</menu>

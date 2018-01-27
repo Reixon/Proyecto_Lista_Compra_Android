@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.reixon.codigodebarras.Inicio"
-    tools:showIn="@layout/app_bar_inicio">
+    tools:context="com.example.reixon.codigodebarras.ui.Inicio">
 
     <TableLayout
         android:layout_width="match_parent"
@@ -80,8 +79,7 @@
                 android:id="@+id/btConnection"
                 android:layout_width="10dp"
                 android:layout_height="120dp"
-                android:layout_marginRight="5dp"
-                android:background="@drawable/ic_menu_share" />
+                android:layout_marginRight="5dp" />
 
         </TableRow>
 

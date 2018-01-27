@@ -7,11 +7,11 @@
     <string name="title_aplication">Codigo de Barras</string>
     <string name="title_activity_stock_product">stock_product</string>
     <string name="title_activity_main_menu_activity">main_menu_activity</string>
-    <string name="action_share_products">Compartir</string>
-    <string name="action_share_buy_list">Compartir lista</string>
+
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_settings">Settings</string>
     <string name="buttonAdminList">Crear lista</string>
+    <string name="buttonAddCategoryAdmin">Crear Categoria</string>
     <string name="etPrecioTotal">Precio Total: </string>
     <string name="etNumPro">Número elementos: </string>
     <string name="etAnyadir">Añadir</string>
@@ -19,18 +19,32 @@
     <string name="descriptionBtOk">Añadir producto</string>
     <string name="descriptionPhotoBt">Photo Button</string>
 
+    <!--View Product-->
+    <string name="etName">Introduce el nombre del producto</string>
+    <string name="etPrice">Precio</string>
+    <string name="etQuantity">Cantidad</string>
+
     <!--menu_product-->
     <string name="Aceptar">Aceptar</string>
     <string name="Borrar">Borrar</string>
 
     <!--menu buy list-->
-    <string name="Administrar_lista">Administrar lista</string>
-    <string name="Eliminar_lista">Eliminar lista</string>
-
+    <string name="menu_share_buy_list">Compartir</string>
+    <string name="menu_save_history">Guardar historial</string>
+    <string name="menu_syncronize">Sincronizar</string>
+    <string name="menu_addShare">Añadir Contacto</string>
 
     <!--menu list prod -->
     <string name="Borrar_Producto">Borrar Producto</string>
     <string name="CheckAll">CheckAll</string>
+
+    <!--menu Navigation-->
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <!---->
+    <string name="sync_account_type">codigodebarras.example.com</string>
+    <string name="content_authority">com.example.android.codigodebarras.app</string>
 
     <!-- Strings related to Settings -->
 
@@ -122,4 +136,5 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawer</string>
 </resources>
