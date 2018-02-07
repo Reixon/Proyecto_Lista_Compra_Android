@@ -119,10 +119,16 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_login">Iniciar sesión</string>
 
+
+    <!--Cambiar contraseña-->
+    <string name="change_password_action_change">Cambiar contraseña</string>
+    <string name="change_password_new_password">Nueva Contraseña</string>
+
     <!-- Strings related to login AND create-->
-    <string name="prompt_user">Name</string>
+    <string name="prompt_user">Nombre</string>
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
+    <string name="prompt_password">Contraseña</string>
+
     <string name="action_sign_in">CREAR CUENTA</string>
     <string name="action_sign_in_short">INICIAR</string>
     <string name="error_this_email_is_add">Esta cuenta ya esta agregada</string>
