@@ -2,11 +2,17 @@ package com.example.reixon.codigodebarras.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.NavigationView;
@@ -30,13 +36,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.Class.Category;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
-import com.example.reixon.codigodebarras.Class.User;
+import com.example.reixon.codigodebarras.Model.Category;
+import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
+import com.example.reixon.codigodebarras.Model.UserAccount;
 import com.example.reixon.codigodebarras.R;
 import com.example.reixon.codigodebarras.db.MySQL;
 import com.example.reixon.codigodebarras.http.ProcessJSON;
+import com.example.reixon.codigodebarras.sync.AccountAuthenticator;
+import com.example.reixon.codigodebarras.sync.ListShopContract;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -53,22 +61,51 @@ public class lista_compra extends AppCompatActivity {
     private ArrayList<Producto> listaProductosCompra;;
     private ArrayList<String> arrayNombreSupers;
     private ArrayList<Category> arrayCategories;
-    private ArrayList<SuperMerc>arraySupers;
+    private ArrayList<String> arrayNameCategories;
+    private ArrayList<SuperMercado>arraySupers;
+    private ArrayList<UserAccount>userAccounts;
     private ArrayList<Producto>productoTotal;
-    private ArrayList<User> usersAccounts;
-    private SuperMerc sp;
+    private SuperMercado sp;
     private SQLiteDatabase db;
     private MySQL mysql;
     private boolean loadData, menu_active;;
     private static final int LOAD_DATA_MYSQL=100;
     private PowerManager pm;
     private PowerManager.WakeLock wakelock;
+    private AccountManager mAccountManager;
+    private String token;
+
+    private AccountManagerCallback<Bundle> mGetAuthTokenCallback =
+            new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(final AccountManagerFuture<Bundle> arg0) {
+                    try {
+                        token = (String) arg0.getResult().get(AccountManager.KEY_AUTHTOKEN);
+                    } catch (Exception e) {
+                        // handle error
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation_drawer);
+        ContentResolver resolver = getContentResolver();
+        mAccountManager = (AccountManager) getSystemService(
+                ACCOUNT_SERVICE);
+        Account[] accounts = mAccountManager.getAccountsByType(AccountAuthenticator.ACCOUNT_TYPE);
+        if (accounts.length != 0){
+            mAccount = accounts[0];
+            mAccountManager.getAuthToken(mAccount, AccountAuthenticator.ACCOUNT_TYPE, null, this,
+                    mGetAuthTokenCallback, null);
+            resolver.setIsSyncable(mAccount, ListShopContract.AUTHORITY, 1);
+            resolver.setSyncAutomatically(mAccount, ListShopContract.AUTHORITY, true);
+        }
 
+        TableObserver observer = new TableObserver(null);
+        resolver.registerContentObserver(ListShopContract.LISTSHOPS_URI, true, observer);
+
+        setContentView(R.layout.activity_navigation_drawer);
         Spinner spinner_super = (Spinner)findViewById(R.id.spinner_super);
         ImageButton bt_speak =(ImageButton)findViewById(R.id.bt_speak);
         EditText txt_edit =(EditText)findViewById(R.id.txt_lista_productos);
@@ -103,30 +140,38 @@ public class lista_compra extends AppCompatActivity {
         arraySupers = mysql.cargarSuperMercadosBD(db);
         arrayCategories = mysql.loadCategories(db);
         productoTotal = mysql.loadFullProduct(db);
-        usersAccounts = mysql.loadUser(db);
+        userAccounts = mysql.loadUser(db);
         db.close();
 
         /**************+*Usuarios***************/
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if(usersAccounts.size()>0) {
+        if(userAccounts.size()>0) {
             View headerView = navigationView.getHeaderView(0);
             TextView nameUser = (TextView) headerView.findViewById(R.id.et_name_user);
-            nameUser.setText(usersAccounts.get(0).getUserName());
+            nameUser.setText(userAccounts.get(0).getName());
             TextView email = (TextView) headerView.findViewById(R.id.et_email_user);
-            email.setText(usersAccounts.get(0).getEmail());
+            email.setText(userAccounts.get(0).getEmail());
         }
 
         arrayNombreSupers = new ArrayList<>();
         for(int i=0; i<arraySupers.size(); i++){
             arrayNombreSupers.add(arraySupers.get(i).getNombre());
         }
-
         spinner_super.setSelection(0);
-        sp = (SuperMerc)arraySupers.get(spinner_super.getSelectedItemPosition());
+        sp = (SuperMercado)arraySupers.get(spinner_super.getSelectedItemPosition());
+
+        arrayNameCategories = new ArrayList<>();
+        for(int i=0; i<arrayNameCategories.size(); i++){
+            arrayNameCategories.add(arrayCategories.get(i).getNombre());
+            for(int x =0; x<sp.getProductos().size();x++){
+                if(arrayCategories.get(i).getId()==sp.getProductos().get(x).getCategoria())
+                    arrayNameCategories.add(sp.getProductos().get(x).getNombre());
+            }
+        }
 
         this.listaProductosCompra = sp.getProductos();
         adapterListCom = new AdapterListBuyProd(this,R.layout.stock_product_adapter,
-                listaProductosCompra,sp);
+                listaProductosCompra,sp,arrayNameCategories);
         listView.setAdapter(adapterListCom);
 
 
@@ -171,8 +216,15 @@ public class lista_compra extends AppCompatActivity {
                     case R.id.nav_history:
                         break;
                     case R.id.nav_account:
-                        i = new Intent(lista_compra.this,Shared_option_list.class);
+                        i = new Intent(lista_compra.this,Admin_account.class);
+                        b.putSerializable("Array Users", userAccounts);
+                        i.putExtras(b);
                         startActivityForResult(i,LOAD_DATA_MYSQL);
+                        break;
+                    case R.id.nav_settings:
+                        break;
+                    case R.id.nav_about:
+
                         break;
 
                 }
@@ -192,7 +244,7 @@ public class lista_compra extends AppCompatActivity {
                 Producto p = listaProductosCompra.get(pos);
                 Bundle b = new Bundle();
                 b.putSerializable("Producto", p);
-                b.putSerializable("SuperMerc",arraySupers.get(spinner.getSelectedItemPosition()));
+                b.putSerializable("SuperMercado",arraySupers.get(spinner.getSelectedItemPosition()));
                 b.putBoolean("LISTA_COMPRA",true);
                 Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
                 intentViewProduct.putExtras(b);
@@ -278,7 +330,7 @@ public class lista_compra extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
                     Spinner spiner = (Spinner)findViewById(R.id.spinner_super);
-                    sp = (SuperMerc) arraySupers.get(spiner.getSelectedItemPosition());
+                    sp = (SuperMercado) arraySupers.get(spiner.getSelectedItemPosition());
                     listaProductosCompra = sp.getProductos();
                     adapterListCom.setSuper(sp);
             }
@@ -293,6 +345,36 @@ public class lista_compra extends AppCompatActivity {
         wakelock.acquire();
 
     }
+    /**
+     * Escucha los cambios que hayan en
+     * {@link com.example.reixon.codigodebarras.sync.ListShopsProvider}.
+     */
+    public class TableObserver extends ContentObserver {
+
+        public TableObserver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         * Define el método que es llamado cuando los datos en el content provider cambian.
+         * Este método es solo para que haya compatibilidad con plataformas más viejas.
+         */
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+        /**
+         * Define el método que es llamado cuando los datos en el content provider cambian.
+         */
+        @Override
+        public void onChange(boolean selfChange, Uri changeUri) {
+
+            if (mAccount != null) {
+                // Corre la sincronizacion
+                ContentResolver.requestSync(mAccount, ListShopContract.AUTHORITY, null);
+            }
+        }
+    }
 
     public void onResume() {
         super.onResume();
@@ -302,7 +384,7 @@ public class lista_compra extends AppCompatActivity {
             arraySupers = mysql.cargarSuperMercadosBD(db);
             arrayCategories = mysql.loadCategories(db);
             productoTotal = mysql.loadFullProduct(db);
-            usersAccounts = mysql.loadUser(db);
+            userAccounts = mysql.loadUser(db);
             db.close();
 
             Spinner spinner_super = (Spinner)findViewById(R.id.spinner_super);
@@ -314,15 +396,22 @@ public class lista_compra extends AppCompatActivity {
             }
             spinner_super.setAdapter(new ArrayAdapter<>(lista_compra.this,
                     android.R.layout.simple_list_item_1, arrayNombreSupers));
+            arrayNameCategories = new ArrayList<>();
+            for(int i=0; i<arrayNameCategories.size(); i++){
+                arrayNameCategories.add(arrayCategories.get(i).getNombre());
+            }
             adapterListCom.setSuper(sp);
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            if(usersAccounts.size()>0) {
+
+            if (userAccounts.size()!=0){
+                UserAccount user = userAccounts.get(0);
                 View headerView = navigationView.getHeaderView(0);
                 TextView nameUser = (TextView) headerView.findViewById(R.id.et_name_user);
-                nameUser.setText(usersAccounts.get(0).getUserName());
+                nameUser.setText(user.getName());
                 TextView email = (TextView) headerView.findViewById(R.id.et_email_user);
-                email.setText(usersAccounts.get(0).getEmail());
+                email.setText(user.getEmail());
             }
+
             loadData=false;
         }
         ListView listView = (ListView) findViewById(R.id.lista_productos_comprar);
@@ -385,7 +474,7 @@ public class lista_compra extends AppCompatActivity {
                 if (result.getContents() == null) {
                     Toast.makeText(this, "Escaneo cancelado", Toast.LENGTH_SHORT).show();
                 } else {
-                    db = mysql.getWritableDatabase();
+                    db = mysql.getReadableDatabase();
                     Producto p = mysql.searchProductoWithCode(result.getContents(), db);
                     if (p != null) {
                         if (p.getNombre().equals("")) {
@@ -394,17 +483,17 @@ public class lista_compra extends AppCompatActivity {
                             try {
                                 Intent i = new Intent(this, ViewProduct.class);
                                 i.putExtra("Producto_scanner", p);
-                                i.putExtra("SuperMerc", sp);
+                                i.putExtra("SuperMercado", sp);
                                 i.putExtra("Lista Supers", arraySupers);
                                 startActivityForResult(i,LOAD_DATA_MYSQL);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
-                    } else {
+                    } else {/*PRODUCTO NO EXISTE EN LA BD*/
                         Intent i = new Intent(lista_compra.this, Add_product.class);
                         i.putExtra("Add_lista","");
-                        i.putExtra("SuperMerc",sp);
+                        i.putExtra("SuperMercado",sp);
                         try {
                             p=new ProcessJSON(this).execute(result.getContents().toString()).get();
                             if(p!=null){
@@ -428,7 +517,7 @@ public class lista_compra extends AppCompatActivity {
         }
     }
 
-    public void deleteProductCheck(){
+    /*public void deleteProductCheck(){
         int posSig;
         String nombres="";
         for(int i=0; i<listaProductosCompra.size(); i++){
@@ -442,7 +531,7 @@ public class lista_compra extends AppCompatActivity {
         adapterListCom.setList(sp.getProductos());
         Toast.makeText(this, nombres + " eliminados", Toast.LENGTH_SHORT).show();
         adapterListCom.notifyDataSetChanged();
-    }
+    }*/
 
 
     @Override
@@ -497,12 +586,13 @@ public class lista_compra extends AppCompatActivity {
                 Intent intent;
                 switch(which){
                     case 0:
-                        if(usersAccounts==null) {
-                            Intent i = new Intent(lista_compra.this, Shared_option_list.class);
-                            startActivity(i);
-                        }else{
-                            sendList();
-                        }
+                        sendList();
+                       // if(usersAccounts==null) {
+                       /*     Intent i = new Intent(lista_compra.this, Admin_account.class);
+                            startActivity(i);*/
+                      /*  }else{
+
+                        }*/
                         break;
                     case 1:
                         /*Compartir lista por texto*/
@@ -616,9 +706,9 @@ public class lista_compra extends AppCompatActivity {
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = "com.example.android.datasync.provider";
     // An account type, in the form of a domain name
-    public static final String ACCOUNT_TYPE = "codigo.example.com";
+    public static final String ACCOUNT_TYPE = "com.example.reixon.codigodebarras";
     // The account name
-    public static final String ACCOUNT = "dummyaccount";
+    public static final String ACCOUNT = "";
     // Instance fields
     Account mAccount;
 

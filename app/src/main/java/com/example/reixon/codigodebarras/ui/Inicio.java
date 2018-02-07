@@ -13,10 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.reixon.codigodebarras.Class.Category;
+import com.example.reixon.codigodebarras.Model.Category;
 import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
+import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.R;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class Inicio extends AppCompatActivity {
     private SQLiteDatabase db;
     private MySQL mysql;
-    private ArrayList<SuperMerc>arraySupers;
+    private ArrayList<SuperMercado>arraySupers;
     private ArrayList<Producto>productoTotal;
     private ArrayList<Category>arrayCategories;
     private boolean pause;

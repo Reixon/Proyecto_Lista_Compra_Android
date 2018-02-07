@@ -19,8 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
 import com.example.reixon.codigodebarras.R;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class Admin_list extends AppCompatActivity {
     private ListView listView;
     private Adapter adapterListAdmin;
     private ArrayList<String> nameSuperM;
-    private ArrayList<SuperMerc> arraySupers;
+    private ArrayList<SuperMercado> arraySupers;
     private SQLiteDatabase db;
     private MySQL mysql;
 
@@ -43,7 +43,7 @@ public class Admin_list extends AppCompatActivity {
 
         if(getIntent().getExtras()!=null)
         {
-            arraySupers = (ArrayList<SuperMerc>) getIntent().getExtras().getSerializable("Lista Supers");
+            arraySupers = (ArrayList<SuperMercado>) getIntent().getExtras().getSerializable("Lista Supers");
         }
         //Pasar solo los nombres de los superM
         adapterListAdmin = new Adapter(this,R.layout.list_adapter_adm,arraySupers);
@@ -81,7 +81,7 @@ public class Admin_list extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         db = mysql.getWritableDatabase();
-                        SuperMerc lS = new SuperMerc(edit.getText().toString(), 0, 0);
+                        SuperMercado lS = new SuperMercado(edit.getText().toString(), 0, 0);
                         mysql.addSuper(db, lS);
                         arraySupers.add(lS);
                         nameSuperM.add(lS.getNombre());
@@ -108,9 +108,9 @@ public class Admin_list extends AppCompatActivity {
     public class Adapter extends BaseAdapter {
 
         private ViewHolder holder;
-        private ArrayList<SuperMerc>arraySupers;
+        private ArrayList<SuperMercado>arraySupers;
 
-        public Adapter(Context context,int textViewResourceId, ArrayList<SuperMerc>arraySupers) {
+        public Adapter(Context context,int textViewResourceId, ArrayList<SuperMercado>arraySupers) {
 
             mysql = new MySQL(context);
             this.arraySupers = arraySupers;

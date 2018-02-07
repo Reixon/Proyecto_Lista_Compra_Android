@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.Producto;
+import com.example.reixon.codigodebarras.Model.Producto;
 import com.example.reixon.codigodebarras.R;
 
 import java.io.FileInputStream;

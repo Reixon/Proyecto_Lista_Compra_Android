@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
-import com.example.reixon.codigodebarras.Class.Producto;
+import com.example.reixon.codigodebarras.Model.Producto;
 
 import org.json.JSONObject;
 
@@ -42,7 +42,7 @@ public class ProcessJSON  extends AsyncTask<String, Void, Producto> {
             try{
                 JSONObject reader = new JSONObject(stream);
                 JSONObject prod = reader.getJSONObject("product");
-                String name = prod.getString("product_name");
+                String name = prod.getString("brands");
                 if(!prod.getString("quantity").equals("")) {
                     String quantity = prod.getString("quantity");
                 }

@@ -21,6 +21,6 @@
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/image_shared_option_list"
         android:text="TextView"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@drawable/list_item_color_enabled"
         android:textStyle="bold" />
 </RelativeLayout>

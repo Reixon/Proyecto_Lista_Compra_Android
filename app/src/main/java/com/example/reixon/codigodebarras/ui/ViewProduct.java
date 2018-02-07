@@ -35,9 +35,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.Class.Category;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
+import com.example.reixon.codigodebarras.Model.Category;
+import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.R;
 import com.example.reixon.codigodebarras.db.MySQL;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -66,10 +66,10 @@ public class ViewProduct extends AppCompatActivity {
     private EditText txtNameProduct, txtPrecioProducto, txtCant;
     private ArrayList<String> arrayCategoriaN, arrayNombreSupers;
     private ArrayList<Category> arrayCategoria;
-    private ArrayList<SuperMerc> arraySuper;
+    private ArrayList<SuperMercado> arraySuper;
     private int unidadSelec;
     private Producto p;
-    private SuperMerc superMerc;
+    private SuperMercado superMerc;
     private Button anyadirListaCompra;
     private String imagePath;
     private LinearLayout layout_cant;
@@ -146,7 +146,7 @@ public class ViewProduct extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             Bundle b = getIntent().getExtras();
             if(b.getSerializable("Lista Supers")!=null){
-                arraySuper = (ArrayList<SuperMerc>) b.getSerializable("Lista Supers");
+                arraySuper = (ArrayList<SuperMercado>) b.getSerializable("Lista Supers");
                 arrayNombreSupers = new ArrayList<String>();
                 for (int i = 0; i < arraySuper.size(); i++) {
                     arrayNombreSupers.add(arraySuper.get(i).getNombre());
@@ -162,8 +162,8 @@ public class ViewProduct extends AppCompatActivity {
                 this.txtPrecioProducto.setText(p.getPrecio()+"");
                 this.txtScan.setText(p.getCodigo());
                 this.spinnerUnidad.setSelection(p.getUnidad());
-                if(b.getSerializable("SuperMerc")!=null){
-                    superMerc =(SuperMerc)b.getSerializable("SuperMerc");
+                if(b.getSerializable("SuperMercado")!=null){
+                    superMerc =(SuperMercado)b.getSerializable("SuperMercado");
                     layout_cant.setVisibility(View.VISIBLE);
                     Log.d("MyApp",p.getCantidad()+"");
                     double precioT = p.getCantidad()*p.getPrecio();
@@ -281,7 +281,7 @@ public class ViewProduct extends AppCompatActivity {
         spinnerListaCompra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
-                superMerc = (SuperMerc)arraySuper.get(spinnerListaCompra.getSelectedItemPosition());
+                superMerc = (SuperMercado)arraySuper.get(spinnerListaCompra.getSelectedItemPosition());
             }
 
             @Override
@@ -619,7 +619,7 @@ public class ViewProduct extends AppCompatActivity {
                 db = mysql.getWritableDatabase();
                 mysql.modProduct(px, db);
                 Bundle b = getIntent().getExtras();
-                if (b.getSerializable("SuperMerc") != null) {
+                if (b.getSerializable("SuperMercado") != null) {
                     db = mysql.getWritableDatabase();
                     mysql.modificarSuperMerc_Productos(Integer.toString(px.getCantidad()), "cantidad", px, superMerc, db);
                 }

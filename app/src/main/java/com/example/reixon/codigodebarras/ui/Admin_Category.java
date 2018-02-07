@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.reixon.codigodebarras.Class.Category;
+import com.example.reixon.codigodebarras.Model.Category;
 import com.example.reixon.codigodebarras.R;
 import com.example.reixon.codigodebarras.db.MySQL;
 

@@ -1,4 +1,4 @@
-package com.example.reixon.codigodebarras.Class;
+package com.example.reixon.codigodebarras.Model;
 
 import java.io.Serializable;
 

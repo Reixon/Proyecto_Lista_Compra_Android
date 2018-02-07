@@ -13,10 +13,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
+import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.R;
+import com.example.reixon.codigodebarras.db.MySQL;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,20 +31,25 @@ import java.util.List;
 
 public class AdapterListBuyProd extends BaseAdapter {
     private ArrayList<Producto> searchList;
+    private ArrayList<String> mtxtList;
     private ViewHolder holder;
     private List<Producto> proList;
     private MySQL mysql;
     private lista_compra context;
     private SQLiteDatabase db;
-    private SuperMerc sp;
+    private SuperMercado sp;
     private boolean [] itemChecks;
     private int numChecks;
     private boolean checkAll;
+    private static final int TYPE_ITEM = 0;
+    private static final int TYPE_SEPARATOR = 1;
 
     public AdapterListBuyProd(Context context,
-            int textViewResourceId, ArrayList<Producto> listaProductosDada,SuperMerc sp) {
+            int textViewResourceId, ArrayList<Producto> listaProductosDada,SuperMercado sp,
+                              ArrayList<String> txtList) {
         this.context = (lista_compra) context;
         proList = listaProductosDada;
+        mtxtList = txtList;
         searchList = listaProductosDada;
         itemChecks = new boolean[listaProductosDada.size()];
         numChecks=0;
@@ -86,6 +91,7 @@ public class AdapterListBuyProd extends BaseAdapter {
         TextView precio;
         TextView cantidad;
         CheckBox check;
+        TextView category;
     }
 
 
@@ -94,7 +100,7 @@ public class AdapterListBuyProd extends BaseAdapter {
         return proList.size();
     }
 
-   public void setSuper(SuperMerc sm){
+   public void setSuper(SuperMercado sm){
        this.sp = sm;
        this.proList = new ArrayList<>(sp.getProductos());
        this.searchList = new ArrayList<>(sp.getProductos());
@@ -109,6 +115,12 @@ public class AdapterListBuyProd extends BaseAdapter {
     }
 
     @Override
+    public int getItemViewType(int position) {
+        //if(getItem(position) instanceof Producto)
+        return 0;
+    }
+
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -119,19 +131,29 @@ public class AdapterListBuyProd extends BaseAdapter {
             {
                 LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 holder = new ViewHolder();
+                int rowType = getItemViewType(position);
 
-                convertView = vi.inflate(R.layout.stock_product_adapter, null);
-                holder.imagen = (ImageView) convertView
-                        .findViewById(R.id.imagenListProductos);
-                holder.name = (TextView) convertView.findViewById(R.id.nombre);
-                holder.precio = (TextView) convertView.findViewById(R.id.txt_precio_prod);
-                holder.check = (CheckBox) convertView.findViewById(R.id.etcheckBox);
-                holder.cantidad = (TextView) convertView.findViewById(R.id.txtCantidad);
+                switch (rowType) {
+                    case TYPE_ITEM:
+                        convertView = vi.inflate(R.layout.stock_product_adapter, null);
+                        holder.imagen = (ImageView) convertView
+                                .findViewById(R.id.imagenListProductos);
+                        holder.name = (TextView) convertView.findViewById(R.id.nombre);
+                        holder.precio = (TextView) convertView.findViewById(R.id.txt_precio_prod);
+                        holder.check = (CheckBox) convertView.findViewById(R.id.etcheckBox);
+                        holder.cantidad = (TextView) convertView.findViewById(R.id.txtCantidad);
+                        break;
+                    case TYPE_SEPARATOR:
+                        convertView = vi.inflate(R.layout.category_adapter_header, null);
+                        holder.category = (TextView)convertView.findViewById(R.id.et_category);
+                    break;
 
+                }
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+
                 Producto p = this.proList.get(position);
                 holder.name.setText(p.getNombre() + " ");
                 holder.check.setChecked(itemChecks[position]);

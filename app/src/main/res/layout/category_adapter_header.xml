@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/background_dark"
+    android:background="@android:color/darker_gray"
     >
 
 
@@ -13,7 +13,6 @@
         android:layout_marginLeft="5dp"
         android:layout_weight="1"
         android:text="categoria"
-        android:textColor="@android:color/background_light"
         android:textSize="14sp"
         android:textStyle="bold" />
 </LinearLayout>

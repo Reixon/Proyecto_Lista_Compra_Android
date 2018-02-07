@@ -1,5 +1,8 @@
 package com.example.reixon.codigodebarras.ui;
 
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorActivity;
+import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -17,7 +20,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,9 +32,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.User;
 import com.example.reixon.codigodebarras.R;
+import com.example.reixon.codigodebarras.db.MySQL;
+import com.example.reixon.codigodebarras.sync.AccountAuthenticator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,20 +57,22 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AccountAuthenticatorActivity
+        implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+    public static final String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
+    public static final String ARG_AUTH_TYPE = "AUTH_TYPE_CODIGO_BARRAS";
+    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
+    public static final String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
+    public static final String PARAM_USER_PASS = "USER_PASS";
+    public static final String PARAM_USER_NAME ="USER_NAME";
+
+    private AccountManager mAccountManager;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -87,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+        mAccountManager = AccountManager.get(this);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -177,13 +182,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
+        // Check for a valid password, if the result entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
-
+        MySQL mysql = new MySQL(this);
+        SQLiteDatabase db = mysql.getWritableDatabase();
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -194,6 +200,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView = mEmailView;
             cancel = true;
         }
+        else if(mysql.searchUserEmail(email,db)){
+            mEmailView.setError(getString(R.string.error_this_email_is_add));
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -201,7 +214,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the result login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
@@ -257,7 +270,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
+                // Retrieve data rows for the device result's 'profile' contact.
                 Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
                         ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
 
@@ -267,7 +280,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 .CONTENT_ITEM_TYPE},
 
                 // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
+                // a primary email address if the result hasn't specified one.
                 ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
     }
 
@@ -312,13 +325,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * the result.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mEmail;
         private final String mPassword;
-        private String userName;
+        private String result;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -334,7 +347,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected String doInBackground(Void... param) {
             // TODO: attempt authentication against a network service.
             HttpURLConnection client = null;
-            Boolean b=false;
 
             BufferedReader reader=null;
             try {
@@ -368,8 +380,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     while ((line = reader.readLine()) != null) {
                         result.append(line);
                     }
-                    userName = result.toString();
-                    if(!userName.isEmpty()){
+                    this.result = result.toString();
+                    if(!this.result.equals(" ")){
                         return "true";
                     }
                     else {
@@ -401,19 +413,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
             if (success.contentEquals("true")) {
-                Toast.makeText(LoginActivity.this,"Bienvenido "+ userName,Toast.LENGTH_SHORT).show();
-                User user = new User(userName,this.mEmail);
-                MySQL mysql = new MySQL(LoginActivity.this);
-                SQLiteDatabase db = mysql.getWritableDatabase();
-                mysql.insertUser(userName, mEmail, db);
-                setResult(RESULT_OK);
-                startActivity(new Intent(getBaseContext(), lista_compra.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
-                finish();
+
+                String[] userParameters = this.result.split(" ");
+
+                final Intent res = new Intent();
+                res.putExtra(AccountManager.KEY_ACCOUNT_NAME, userParameters[4]);
+                res.putExtra(AccountManager.KEY_ACCOUNT_TYPE, AccountAuthenticator.ACCOUNT_TYPE);
+                res.putExtra(AccountManager.KEY_AUTHTOKEN, userParameters[3]);
+                res.putExtra(PARAM_USER_PASS, userParameters[2]);
+                res.putExtra(PARAM_USER_NAME, userParameters[1]);
+
+                /*Bundle userData = new Bundle();
+                userData.putString(USERDATA_USER_OBJ_ID, user.getObjectId());
+                data.putBundle(AccountManager.KEY_USERDATA, userData);
+
+                data.putString(PARAM_USER_PASS, userPass);*/
+
+
+                finishLog(res);
+
             } else if (success.contentEquals("false")){
-                Toast.makeText(LoginActivity.this,"Incorrecto",Toast.LENGTH_SHORT).show();
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                Toast.makeText(LoginActivity.this,getString(R.string.error_this_account_not_exist),Toast.LENGTH_SHORT).show();;
             }
             else if(success.contentEquals("exception")){
                 Toast.makeText(LoginActivity.this,"ocurrio un error",Toast.LENGTH_SHORT).show();
@@ -425,6 +445,39 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+
+    public void finishLog(Intent i){
+        String accountName = i.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+        String pass = i.getStringExtra(PARAM_USER_PASS);
+        String name = i.getStringExtra(PARAM_USER_NAME);
+
+        AutoCompleteTextView emailTxt = findViewById(R.id.email);
+
+        final Account account = new Account(accountName,i.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
+
+    //    if(getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)){
+            String authToken = i.getStringExtra(AccountManager.KEY_AUTHTOKEN);
+            String authTokenType = LoginActivity.ARG_AUTH_TYPE;
+            mAccountManager.addAccountExplicitly(account,pass,null);
+            mAccountManager.setAuthToken(account,authTokenType,authToken);
+    /*    }
+        else{
+            mAccountManager.setPassword(account,pass);
+        }*/
+
+        MySQL mysql = new MySQL(this);
+        SQLiteDatabase db = mysql.getWritableDatabase();
+        mysql.insertUser(name, accountName, authToken,db);
+
+
+        setAccountAuthenticatorResult(i.getExtras());
+        Intent intent = new Intent(getBaseContext(), lista_compra.class);
+        setResult(RESULT_OK, intent);
+        startActivity(intent
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+        finish();
     }
 
     private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException

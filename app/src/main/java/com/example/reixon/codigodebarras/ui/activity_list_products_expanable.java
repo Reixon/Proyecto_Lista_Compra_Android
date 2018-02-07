@@ -24,10 +24,10 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.Class.Category;
+import com.example.reixon.codigodebarras.Model.Category;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
+import com.example.reixon.codigodebarras.Model.Producto;
 import com.example.reixon.codigodebarras.R;
 import com.example.reixon.codigodebarras.http.ProcessJSON;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -48,7 +48,7 @@ public class activity_list_products_expanable extends AppCompatActivity {
 
     private Adapter_categories_expanable adapterListPro;
     private ArrayList<String> listaSuperNombre;
-    private ArrayList<SuperMerc>arraySupers;
+    private ArrayList<SuperMercado>arraySupers;
     private ArrayList<Producto>productoTotal;
     private ArrayList<Category>arrayCategories;
     private ArrayList<Category> groups;
@@ -97,7 +97,7 @@ public class activity_list_products_expanable extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
-            arraySupers = (ArrayList<SuperMerc>) b.getSerializable("Lista Supers");
+            arraySupers = (ArrayList<SuperMercado>) b.getSerializable("Lista Supers");
             productoTotal = (ArrayList<Producto>) b.getSerializable("Full Products");
             arrayCategories = (ArrayList<Category>) b.getSerializable("Array Categories");
             groups = prepareData(productoTotal, this.arrayCategories);

@@ -34,12 +34,21 @@
                 android:title="Send" />
         </menu>
     </item>-->
+    <item android:title="Cuenta">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_account_circle_48px"
+                android:title="Cuentas" />
+         <!--   <item
+                android:id="@+id/nav_close_session"
+                android:icon="@drawable/icon_cross"
+                android:title="Cerrar Sesión" />-->
+        </menu>
+    </item>
+
     <item android:title="Opciones">
         <menu>
-            <item android:title="Cuentas"
-                android:icon="@drawable/ic_account_circle_48px"
-                android:id="@+id/nav_account"
-                />
             <item
                 android:title="Ajustes"
                 android:id="@+id/nav_settings"
@@ -51,6 +60,7 @@
                 android:title="Acerca de" />
         </menu>
     </item>
+
 
 
 

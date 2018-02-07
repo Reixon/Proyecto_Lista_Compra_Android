@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.reixon.codigodebarras.Class.Category;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
-import com.example.reixon.codigodebarras.Class.User;
+import com.example.reixon.codigodebarras.Model.Category;
+import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
+import com.example.reixon.codigodebarras.Model.UserAccount;
 
 import java.util.ArrayList;
 
@@ -24,6 +24,14 @@ public class MySQL extends SQLiteOpenHelper{
 
     private static final String DATABASE_NAME = "MyShop.db";
     private static final int DATABASE_VERSION = 1;
+    private static MySQL intance;
+
+    public static synchronized MySQL getInstance(Context context){
+        if(intance == null){
+            intance = new MySQL(context.getApplicationContext());
+        }
+        return intance;
+    }
 
     public MySQL(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -71,10 +79,12 @@ public class MySQL extends SQLiteOpenHelper{
         db.execSQL("CREATE TABLE User(" +
                 " id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 " name TEXT UNIQUE, " +
-                " email TEXT UNIQUE ); ");
+                " email TEXT UNIQUE," +
+                " accountSelected INTEGER," +
+                " token TEXT); ");
 
         this.addCategoria("Sin Categoria", db);
-        this.addSuper(db,new SuperMerc(0,"lista",0,0));
+        this.addSuper(db,new SuperMercado(0,"lista",0,0));
 
     }
 
@@ -127,7 +137,7 @@ public class MySQL extends SQLiteOpenHelper{
         db.update("Category", v, "id='" + id + "'", null);
     }
 
-    public void addSuper(SQLiteDatabase db, SuperMerc superM) {
+    public void addSuper(SQLiteDatabase db, SuperMercado superM) {
         System.out.println("****INSERTAR SUPERMERCADO******");
 
         db.execSQL("INSERT INTO SuperMercado(nombre, numProductosParaComprar, numProductosComprados) "
@@ -145,7 +155,7 @@ public class MySQL extends SQLiteOpenHelper{
 
     public ArrayList cargarSuperMercadosBD(SQLiteDatabase db) {
 
-        ArrayList<SuperMerc>superMercados = new ArrayList();
+        ArrayList<SuperMercado>superMercados = new ArrayList();
 
         Log.d("MyApp", "CargarDatos SuperMercado");
 
@@ -169,7 +179,7 @@ public class MySQL extends SQLiteOpenHelper{
             ArrayList<Producto> listaProductos = this.cargarProductosListaCompra(Integer.parseInt(columns[0]),db);
             Log.d("MyApp","lista Productos " + listaProductos.size());
 
-            SuperMerc sup = new SuperMerc(Integer.parseInt(columns[0]),columns[1],
+            SuperMercado sup = new SuperMercado(Integer.parseInt(columns[0]),columns[1],
                     Integer.parseInt(columns[2]), Integer.parseInt(columns[3]));
             sup.setProductos(listaProductos);
 
@@ -216,7 +226,7 @@ public class MySQL extends SQLiteOpenHelper{
     }
 
     //anyade un producto a la BD, carga el id del producto y lo almacena en la lista de super
-    public void add_Producto_And_Add_Producto_To_Lista_Supermercado(SQLiteDatabase db, SuperMerc superM, Producto p){
+    public void add_Producto_And_Add_Producto_To_Lista_Supermercado(SQLiteDatabase db, SuperMercado superM, Producto p){
 
         this.addProducto(p.getNombre(),Double.toString(p.getPrecio()),p.getRutaImagen(),p.getCodigo(),p.getCategoria(),p.getUnidad(),db);
         //SELECT MAX(id) FROM tabla
@@ -234,11 +244,11 @@ public class MySQL extends SQLiteOpenHelper{
     }
 
 
-    public void add_Producto_A_Lista_SuperMercado(SQLiteDatabase db, SuperMerc superM, Producto p) {
+    public void add_Producto_A_Lista_SuperMercado(SQLiteDatabase db, SuperMercado superM, Producto p) {
         //INSERTAMOS EN LA TABLA SUPER_PRO EL ID DEL SUPER Y LA ID DEL PRODUCTO
 
 
-        Log.d("MyApp", "INSERTAMOS SuperMerc" + superM.toString() + ", Producto " + p.toString());
+        Log.d("MyApp", "INSERTAMOS SuperMercado" + superM.toString() + ", Producto " + p.toString());
 
         db.execSQL("INSERT INTO SuperMerc_Producto(idSuperMerc, idProducto, cantidad) "
                 + "values("
@@ -253,7 +263,7 @@ public class MySQL extends SQLiteOpenHelper{
         //consulta(db);
     }
 
-    public void modificarSuperMerc_Productos(String nuevoNombre, String campo, Producto p, SuperMerc superMerc,
+    public void modificarSuperMerc_Productos(String nuevoNombre, String campo, Producto p, SuperMercado superMerc,
                                      SQLiteDatabase db) {
         ContentValues v = new ContentValues();
 
@@ -262,7 +272,7 @@ public class MySQL extends SQLiteOpenHelper{
         db.update("SuperMerc_Producto", v, "idProducto='"+p.getId()+"' AND idSuperMerc='"+superMerc.getId()+"'", null);
     }
 
-   /* private void modSuperMerc_ProductosIDS(Producto p, SuperMerc superM, SQLiteDatabase db){
+   /* private void modSuperMerc_ProductosIDS(Producto p, SuperMercado superM, SQLiteDatabase db){
         Log.d("MyApp", "BD MODIFICAR SUPER_PROD");
         ContentValues cv = new ContentValues();
 
@@ -270,7 +280,7 @@ public class MySQL extends SQLiteOpenHelper{
 
         db.update("SuperMerc_Producto", cv, "idProducto='"+p.getId()+"' AND idSuperMerc='"+superM.getId()+"'", null);
 
-        Log.d("MyApp","SuperMerc Modificado");
+        Log.d("MyApp","SuperMercado Modificado");
     }*/
 
     /*Cargar categorias*/
@@ -322,13 +332,26 @@ public class MySQL extends SQLiteOpenHelper{
            // Log.d("MyApp", "Encontrado");
         } else
             Log.d("MyApp", "No existe ningún producto con ese codigo");
-
-
-
-
         return p;
     }
-    public Producto searchProductoWithName(String name, SQLiteDatabase db){
+    /*Buscar producto por Codigo de barras*/
+    public boolean searchUserEmail(String userEmail, SQLiteDatabase db){
+        boolean bool=false;
+        String[] args = new String[]{userEmail};
+        Cursor mCursor = db.rawQuery("SELECT count(email) FROM User WHERE email=? ", args);
+        int count=-1;
+        if (mCursor.moveToFirst()) {
+            do {
+                count = mCursor.getInt(0);
+            } while(mCursor.moveToNext());
+        }
+        if(count>=1){
+            bool=true;
+        }
+
+        return bool;
+    }
+    /*public Producto searchProductoWithName(String name, SQLiteDatabase db){
 
         Producto p=null;
         Log.d("MyApp", "BUSCAR PRODUCT");
@@ -337,9 +360,7 @@ public class MySQL extends SQLiteOpenHelper{
                 " FROM Product WHERE nombre=? ", args);
         Log.d("MyApp", "consulta realizada");
         if (fila.moveToFirst()) {
-
             do {
-
                 p = new Producto(Integer.parseInt(fila.getString(0)), fila.getString(1), fila.getDouble(2),
                         fila.getString(3),  fila.getString(4), Integer.parseInt(fila.getString(5)), Integer.parseInt(fila.getString(6)));
 
@@ -354,7 +375,7 @@ public class MySQL extends SQLiteOpenHelper{
 
 
         return p;
-    }
+    }*/
 
     /*Añadir un producto nuevo*/
     public void addProducto(String nombre, String precio, String rutaImagen, String codigo,
@@ -385,15 +406,15 @@ public class MySQL extends SQLiteOpenHelper{
         Log.d("MyApp","Producto Modificado");
     }
 
-    public ArrayList<User> loadUser(SQLiteDatabase db) {
-        Cursor fila = db.rawQuery("SELECT id, name, email FROM User", null);
-        ArrayList<User>usersAccounts= new ArrayList<>();
-        User user=null;
+    public ArrayList<UserAccount> loadUser(SQLiteDatabase db) {
+        Cursor fila = db.rawQuery("SELECT id, name, email, token FROM User", null);
+        ArrayList<UserAccount>usersAccounts= new ArrayList<>();
+        UserAccount user=null;
         Log.d("MyApp", "consulta");
         if (fila.moveToFirst()) {
             do {
-                user = new User(fila.getString(1),fila.getString(2));
-                user.setId(Integer.parseInt(fila.getString(0)));
+                user = new UserAccount(fila.getString(1),fila.getString(2),fila.getString(3));
+                user.setId_user(Integer.parseInt(fila.getString(0)));
                 usersAccounts.add(user);
             } while(fila.moveToNext());
         } else
@@ -431,12 +452,30 @@ public class MySQL extends SQLiteOpenHelper{
             db.delete("Category","id='"+idCategory+"'",null);
         }catch(SQLiteException e){e.printStackTrace();}
     }
-
-    public void insertUser(String name, String email, SQLiteDatabase db){
+    public void deleteUser(int idUser, SQLiteDatabase db){
         try {
-            db.execSQL("INSERT INTO User(name, email) "
-                    + "values('" + name + "', '"+email+"');");
+            db.delete("User","id='"+idUser+"'",null);
         }catch(SQLiteException e){e.printStackTrace();}
+    }
+
+    public void updateAccountSelected(int val, int idUser, SQLiteDatabase db){
+        try {
+            ContentValues v = new ContentValues();
+            v.put("accountSelected", val);
+            db.update("User", v, "id='" + idUser + "'", null);
+        }catch (SQLiteException e){e.printStackTrace();}
+    }
+
+
+    public void insertUser(String name, String email, String token, SQLiteDatabase db){
+        try {
+
+            db.execSQL("INSERT INTO User(name, email, token, accountSelected) "
+                    + "values('" + name + "', '"+email+"', '"+token+"', '"+true+"');");
+
+        }catch(SQLiteException e){
+            e.printStackTrace();
+        }
     }
 
   /*  public ArrayList<Category> loadCategories(SQLiteDatabase db){

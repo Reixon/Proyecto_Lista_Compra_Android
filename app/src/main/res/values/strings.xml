@@ -43,7 +43,7 @@
     <string name="drawer_close">Close</string>
 
     <!---->
-    <string name="sync_account_type">codigodebarras.example.com</string>
+    <string name="sync_account_type">com.example.reixon.codigodebarras</string>
     <string name="content_authority">com.example.android.codigodebarras.app</string>
 
     <!-- Strings related to Settings -->
@@ -119,19 +119,24 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_login">Iniciar sesión</string>
 
-    <!-- Strings related to login -->
+    <!-- Strings related to login AND create-->
     <string name="prompt_user">Name</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in">CREAR CUENTA</string>
     <string name="action_sign_in_short">INICIAR</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_this_email_is_add">Esta cuenta ya esta agregada</string>
+    <string name="error_invalid_email">Este email es invalido</string>
+    <string name="error_this_account_not_exist">Esta cuenta no existe</string>
+    <string name="error_this_account_exist">La dirección de correo indicada ya ha sido utilizada en otra cuenta</string>
+    <string name="error_invalid_password">Contraseña demasiado corta</string>
+    <string name="error_incorrect_password">Contraseña incorrecta</string>
+    <string name="error_field_required">Campo requerido</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- NAVIGATE DRAWER-->
     <string name="title_activity_menu_navigate">menu_navigate</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

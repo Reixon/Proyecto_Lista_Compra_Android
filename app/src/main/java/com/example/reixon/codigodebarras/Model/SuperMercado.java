@@ -1,4 +1,4 @@
-package com.example.reixon.codigodebarras.Class;
+package com.example.reixon.codigodebarras.Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,13 +7,13 @@ import java.util.ArrayList;
  * Created by reixon on 08/10/2017.
  */
 
-public class SuperMerc implements Serializable {
+public class SuperMercado implements Serializable {
 
     private int id, numProductosComprados, numProductosParaComprar;
     private String nombre;
     private ArrayList<Producto> productos;
 
-    public SuperMerc(int id, String nombre, int numProductosComprados, int numProductosParaComprar) {
+    public SuperMercado(int id, String nombre, int numProductosComprados, int numProductosParaComprar) {
         this.id = id;
         this.nombre = nombre;
         this.numProductosComprados = numProductosComprados;
@@ -21,7 +21,7 @@ public class SuperMerc implements Serializable {
         this.productos = new ArrayList<>();
     }
 
-    public SuperMerc(String nombre, int numProductosComprados, int numProductosParaComprar) {
+    public SuperMercado(String nombre, int numProductosComprados, int numProductosParaComprar) {
         this.nombre = nombre;
         this.numProductosComprados = numProductosComprados;
         this.numProductosParaComprar = numProductosParaComprar;
@@ -80,7 +80,7 @@ public class SuperMerc implements Serializable {
 
     @Override
     public String toString() {
-        return "SuperMerc{" +
+        return "SuperMercado{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", numProductosComprados=" + numProductosComprados +

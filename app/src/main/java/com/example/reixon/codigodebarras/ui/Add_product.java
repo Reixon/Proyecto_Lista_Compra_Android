@@ -35,10 +35,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.Class.Category;
+import com.example.reixon.codigodebarras.Model.Category;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.db.MySQL;
-import com.example.reixon.codigodebarras.Class.Producto;
-import com.example.reixon.codigodebarras.Class.SuperMerc;
+import com.example.reixon.codigodebarras.Model.Producto;
 import com.example.reixon.codigodebarras.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -77,7 +77,7 @@ public class Add_product extends AppCompatActivity {
     private SQLiteDatabase db;
     private MySQL mysql;
     private boolean addList;
-    private SuperMerc sp;
+    private SuperMercado sp;
     private boolean photo;
 
 
@@ -139,7 +139,7 @@ public class Add_product extends AppCompatActivity {
             }*/
            if(b.get("Add_lista")!=null){
                addList=true;
-               sp = (SuperMerc) b.get("SuperMerc");
+               sp = (SuperMercado) b.get("SuperMercado");
             }
 
             if (b.get("AddProducto") != null) {
