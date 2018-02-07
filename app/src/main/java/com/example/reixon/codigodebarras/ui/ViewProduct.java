@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -60,20 +61,14 @@ public class ViewProduct extends AppCompatActivity {
     private final int MY_PERMISSIONS=100;
     private final int PHOTO_CODE=101;
     private static final int CROP_PICTURE=102;
-    private Spinner spinner_categorias, spinnerListaCompra, spinnerUnidad;
-    private ImageButton scanBtn, btPhot, btCategoria;
-    private TextView txtScan, txtPrecioTotal, etPrecioTotal;
-    private EditText txtNameProduct, txtPrecioProducto, txtCant;
+
     private ArrayList<String> arrayCategoriaN, arrayNombreSupers;
     private ArrayList<Category> arrayCategoria;
     private ArrayList<SuperMercado> arraySuper;
     private int unidadSelec;
     private Producto p;
     private SuperMercado superMerc;
-    private Button anyadirListaCompra;
     private String imagePath;
-    private LinearLayout layout_cant;
-    private RelativeLayout layout;
     private SQLiteDatabase db;
     private MySQL mysql;
     private boolean photo, listBuy;
@@ -84,31 +79,31 @@ public class ViewProduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_product);
 
-        txtNameProduct = (EditText) findViewById(R.id.txtNombre);
-        txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
-        scanBtn = (ImageButton) findViewById(R.id.btBarCode);
-        btPhot = (ImageButton) findViewById(R.id.imageProd);
-        spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
-        btCategoria = (ImageButton) findViewById(btEditCategoria);
-        txtScan = (TextView) findViewById(R.id.txtCodigo);
-
-        anyadirListaCompra = (Button) findViewById(R.id.bt_anyadir_listaCompra_proView);
-        spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
-        spinnerUnidad = (Spinner)findViewById(R.id.spinner_unidad);
-        txtCant =(EditText)findViewById(R.id.txtCantidad_View);
-        txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
-        etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
-        layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
+        EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+        EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+        ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
+        ImageButton btPhot = (ImageButton) findViewById(R.id.imageProd);
+        Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
+        ImageButton btCategoria = (ImageButton) findViewById(btEditCategoria);
+        TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
+        Button anyadirListaCompra = (Button) findViewById(R.id.bt_anyadir_listaCompra_proView);
+        Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
+        Spinner spinnerUnidad = (Spinner)findViewById(R.id.spinner_unidad);
+        EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
+        TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
+        TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
+        LinearLayout layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
         listBuy=false;
-        layout = (RelativeLayout)findViewById(R.id.layout_view_product);
 
         txtPrecioTotal.setVisibility(View.GONE);
         etPrecioTotal.setVisibility(View.GONE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_viewProduct);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,21 +153,21 @@ public class ViewProduct extends AppCompatActivity {
             if (b.getSerializable("Producto") != null) {
                 Log.d("MyApp", "Existe un producto desde lista");
                 p = (Producto) b.getSerializable("Producto");
-                this.txtNameProduct.setText(p.getNombre());
-                this.txtPrecioProducto.setText(p.getPrecio()+"");
-                this.txtScan.setText(p.getCodigo());
-                this.spinnerUnidad.setSelection(p.getUnidad());
+                txtNameProduct.setText(p.getNombre());
+                txtPrecioProducto.setText(p.getPrecio()+"");
+                txtScan.setText(p.getCodigo());
+                spinnerUnidad.setSelection(p.getUnidad());
                 if(b.getSerializable("SuperMercado")!=null){
                     superMerc =(SuperMercado)b.getSerializable("SuperMercado");
                     layout_cant.setVisibility(View.VISIBLE);
                     Log.d("MyApp",p.getCantidad()+"");
                     double precioT = p.getCantidad()*p.getPrecio();
-                    this.txtCant.setText(p.getCantidad()+"");
+                    txtCant.setText(p.getCantidad()+"");
 
                     if(p.getPrecio()>0){
                         txtPrecioTotal.setVisibility(View.VISIBLE);
                         etPrecioTotal.setVisibility(View.VISIBLE);
-                        this.txtPrecioTotal.setText(Double.toString(precioT));
+                        txtPrecioTotal.setText(Double.toString(precioT));
                     }
 
                 }
@@ -213,9 +208,9 @@ public class ViewProduct extends AppCompatActivity {
 
                 p = (Producto) b.getSerializable("Producto_scanner");
 
-                this.txtNameProduct.setText(p.getNombre());
-                this.txtPrecioProducto.setText(p.getPrecio()+"");
-                this.txtScan.setText(p.getCodigo());
+                txtNameProduct.setText(p.getNombre());
+                txtPrecioProducto.setText(p.getPrecio()+"");
+                txtScan.setText(p.getCodigo());
                 Log.d("MyApp", "Ruta imagen '"+p.getRutaImagen()+"'");
                 if(p.getRutaImagen().equals("")){
                     Log.d("MyApp", "Imagen vacia");
@@ -232,7 +227,7 @@ public class ViewProduct extends AppCompatActivity {
                         Bitmap image = BitmapFactory.decodeStream(ims);
                         btPhot.setImageBitmap(image);
                     }catch (Exception e){
-
+                        e.printStackTrace();
                     }
                 }
 
@@ -252,7 +247,7 @@ public class ViewProduct extends AppCompatActivity {
         anyadirListaCompra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //HashSet<Producto> arrayProdBuy = new HashSet<Producto>(superMerc.getProductos());
+                Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
                 int num=  arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos().size();
                 ArrayList<Producto> productos = (ArrayList<Producto>)arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos();
                 boolean b=false;
@@ -281,6 +276,7 @@ public class ViewProduct extends AppCompatActivity {
         spinnerListaCompra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+                Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
                 superMerc = (SuperMercado)arraySuper.get(spinnerListaCompra.getSelectedItemPosition());
             }
 
@@ -292,38 +288,38 @@ public class ViewProduct extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if(v.getId() == R.id.imageProd){
-                    final CharSequence [] option ={"Tomar foto", "Galeria","Cancelar"};
-                    final AlertDialog.Builder builder =
-                            new AlertDialog.Builder(ViewProduct.this);
-                    builder.setTitle("Elige una opcion");
-                    builder.setItems(option, new DialogInterface.OnClickListener() {
+            if(v.getId() == R.id.imageProd){
+                final CharSequence [] option ={"Tomar foto", "Galeria","Cancelar"};
+                final AlertDialog.Builder builder =
+                        new AlertDialog.Builder(ViewProduct.this);
+                builder.setTitle("Elige una opcion");
+                builder.setItems(option, new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.d("MyApp", "caso "+which);
-                            Intent intent;
-                            switch(which){
-                                case 0:
-                                    takePintureIntent();
-                                    break;
-                                case 1:
-                                    intent = new Intent(Intent.ACTION_PICK,
-                                            android.provider.MediaStore.Images.Media.
-                                                    EXTERNAL_CONTENT_URI);
-                                    //indico que tipo de imagens quiero que se puedan ver jpg, png, etc
-                                    intent.setType("image/*");
-                                    //mostrara una lista de aplicaciones que se puedan elegir imagenes.
-                                    startActivityForResult(intent.createChooser(intent, "Selecciona app de imagen"),SELECT_PICTURE);
-                                    break;
-                                case 2:
-                                    dialog.dismiss();
-                                    break;
-                            }
-                        }
-                    });
-                    builder.show();
-                }
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    Log.d("MyApp", "caso "+which);
+                    Intent intent;
+                    switch(which){
+                        case 0:
+                            takePintureIntent();
+                            break;
+                        case 1:
+                            intent = new Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.
+                                            EXTERNAL_CONTENT_URI);
+                            //indico que tipo de imagens quiero que se puedan ver jpg, png, etc
+                            intent.setType("image/*");
+                            //mostrara una lista de aplicaciones que se puedan elegir imagenes.
+                            startActivityForResult(intent.createChooser(intent, "Selecciona app de imagen"),SELECT_PICTURE);
+                            break;
+                        case 2:
+                            dialog.dismiss();
+                            break;
+                    }
+                    }
+                });
+                builder.show();
+            }
             }
         });
 
@@ -344,6 +340,7 @@ public class ViewProduct extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                ImageButton btCategoria = (ImageButton) findViewById(btEditCategoria);
                 if (v.getId() == btCategoria.getId()) {
 
                     /******Ventana de introducir arrayCategoria*******/
@@ -362,6 +359,7 @@ public class ViewProduct extends AppCompatActivity {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
                             db = mysql.getWritableDatabase();
                             mysql.addCategoria(input.getText().toString(), db);
                             db = mysql.getWritableDatabase();
@@ -391,13 +389,7 @@ public class ViewProduct extends AppCompatActivity {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.btBarCode:
-                        IntentIntegrator integrator = new IntentIntegrator(ViewProduct.this);
-                        integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
-                        integrator.setPrompt("Scan");
-                        integrator.setCameraId(0);
-                        integrator.setBeepEnabled(false);
-                        integrator.setBarcodeImageEnabled(false);
-                        integrator.initiateScan();
+                        scannerBarCode();
                         break;
                 }
             }
@@ -419,7 +411,10 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 double total;
+                TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
+                TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
                 EditText txtPrecio = (EditText)findViewById(R.id.txtPrecio);
+                EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
                 if(!s.toString().equals("") && !txtPrecio.getText().toString().equals(""))
                 {
                     int cant = Integer.parseInt(s.toString());
@@ -454,9 +449,12 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 double total;
-                EditText txtcantidad = (EditText)findViewById(R.id.txtCantidad_View);
-                if(!txtcantidad.getText().toString().equals("")) {
-                    int cantidad = Integer.parseInt(txtcantidad.getText().toString());
+                TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
+                TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
+                EditText txtPrecio = (EditText)findViewById(R.id.txtPrecio);
+                EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
+                if(!txtCant.getText().toString().equals("")) {
+                    int cantidad = Integer.parseInt(txtCant.getText().toString());
                     if (!s.toString().equals("") && cantidad > 0) {
                         txtPrecioTotal.setVisibility(View.VISIBLE);
                         etPrecioTotal.setVisibility(View.VISIBLE);
@@ -478,17 +476,43 @@ public class ViewProduct extends AppCompatActivity {
 
     }
 
+
+    /**
+     * Si el la versión del movil es 23+ podrá utilizar el escaner de código de barras
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    private void scannerBarCode() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            IntentIntegrator integrator = new IntentIntegrator(ViewProduct.this);
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
+            integrator.setPrompt("Scan");
+            integrator.setCameraId(0);
+            integrator.setBeepEnabled(false);
+            integrator.setBarcodeImageEnabled(false);
+            integrator.initiateScan();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ViewProduct.this);
+            builder.setTitle("Escaner no disponible");
+            builder.setMessage("El escaner no esta disponible para su versión de móvil");
+            ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
+            scanBtn.setEnabled(false);
+        }
+    }
+
+
     private boolean myRequestStoragePermission(){
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+    /*    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             return true;
-        }
+        }*/
         if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
             return true;
 
         if((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) ||
                 (shouldShowRequestPermissionRationale(CAMERA))){
+            RelativeLayout layout = (RelativeLayout)findViewById(R.id.layout_view_product);
             Snackbar.make(layout,"Los permisos son necesarios para poder usar la aplicacion",Snackbar.
                     LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener(){
 
@@ -594,8 +618,13 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
             int idCategoria, cant=1;
-
-            idCategoria = arrayCategoria.get(spinner_categorias.getSelectedItemPosition()).getId();
+            Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
+            EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
+                EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+                EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+                TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
+                Spinner spinnerUnidad = (Spinner)findViewById(R.id.spinner_unidad);
+                idCategoria = arrayCategoria.get(spinner_categorias.getSelectedItemPosition()).getId();
 
             if(!txtCant.getText().toString().equals("")){
                 cant=Integer.parseInt(txtCant.getText().toString());
@@ -659,6 +688,7 @@ public class ViewProduct extends AppCompatActivity {
                             mysql.eliminar_Producto_D_SuperMerc_Producto(p.getId(),superMerc.getId(),db);
                             setResult(RESULT_OK);
                         }else {
+                            EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
                             db = mysql.getWritableDatabase();
                             mysql.eliminarProducto(p.getId(), db);
                             Toast.makeText(ViewProduct.this, txtNameProduct.getText().toString() + " eliminado",
@@ -707,6 +737,8 @@ public class ViewProduct extends AppCompatActivity {
 
     private void loadImagePath(){
         try {
+            EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+            ImageButton btPhot = (ImageButton) findViewById(R.id.imageProd);
             Bitmap bitmap = ((BitmapDrawable) btPhot.getDrawable()).getBitmap();
             File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
             File ruta=  new File(dirImg, txtNameProduct.getText().toString()+".png");
@@ -716,13 +748,16 @@ public class ViewProduct extends AppCompatActivity {
             imagePath=ruta.getAbsolutePath();
 
 
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         Bundle extras;
         super.onActivityResult(requestCode, resultCode, data);
+        TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
         if(resultCode == RESULT_OK) {
             IntentResult result = IntentIntegrator.parseActivityResult(requestCode,
                     resultCode, data);
@@ -742,6 +777,7 @@ public class ViewProduct extends AppCompatActivity {
                     case PHOTO_CODE:
                         extras = data.getExtras();
                         if(extras!=null){
+                            ImageButton btPhot = (ImageButton) findViewById(R.id.imageProd);
                             Bitmap phot = extras.getParcelable("data");
                             btPhot.setImageBitmap(phot);
                             photo=true;

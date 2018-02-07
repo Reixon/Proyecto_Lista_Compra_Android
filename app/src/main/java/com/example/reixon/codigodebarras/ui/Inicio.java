@@ -138,7 +138,7 @@ public class Inicio extends AppCompatActivity {
                 b.putSerializable("Lista Supers", arraySupers);
                 b.putSerializable("Full Products", productoTotal);
                 b.putSerializable("Array Categories", arrayCategories);
-                Intent i = new Intent(Inicio.this, lista_productos.class);
+                Intent i = new Intent(Inicio.this, Lista_productos.class);
                 i.putExtras(b);
                 startActivity(i);
             }
@@ -168,7 +168,7 @@ public class Inicio extends AppCompatActivity {
                 Bundle b = new Bundle();
                 b.putSerializable("Lista Supers", arraySupers);
                 b.putSerializable("Array Categories", arrayCategories);
-                Intent i = new Intent(Inicio.this, lista_compra.class);
+                Intent i = new Intent(Inicio.this, Lista_compra.class);
                 i.putExtras(b);
                 startActivity(i);
             }

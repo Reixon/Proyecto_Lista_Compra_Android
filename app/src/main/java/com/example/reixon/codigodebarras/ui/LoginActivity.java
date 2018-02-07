@@ -473,7 +473,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
 
         setAccountAuthenticatorResult(i.getExtras());
-        Intent intent = new Intent(getBaseContext(), lista_compra.class);
+        Intent intent = new Intent(getBaseContext(), Lista_compra.class);
         setResult(RESULT_OK, intent);
         startActivity(intent
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));

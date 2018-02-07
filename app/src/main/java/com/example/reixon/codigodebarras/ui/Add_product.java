@@ -59,11 +59,11 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class Add_product extends AppCompatActivity {
 
     private static String APP_DIRECTORY ="Imagenes_MyShop/";
-    private static String MEDIA_DIRECTORY= APP_DIRECTORY +"PictureApp";
     private final int SELECT_PICTURE =300;
     private final int MY_PERMISSIONS=100;
     private final int PHOTO_CODE=200;
     private final int PIC_CROP=2;
+
     private Producto producto;
     private Spinner spinner_categorias, spinnerUnidad;
     private ImageButton scanBtn, btPhot, btCategoria;
@@ -251,13 +251,7 @@ public class Add_product extends AppCompatActivity {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.btBarCode:
-                        IntentIntegrator integrator = new IntentIntegrator(Add_product.this);
-                        integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
-                        integrator.setPrompt("Scan");
-                        integrator.setCameraId(0);
-                        integrator.setBeepEnabled(false);
-                        integrator.setBarcodeImageEnabled(false);
-                        integrator.initiateScan();
+                        scannerBarCode();
                         break;
                 }
             }
@@ -302,6 +296,28 @@ public class Add_product extends AppCompatActivity {
             }
         });
 
+    }
+
+    /**
+     * Si el la versión del movil es 23+ podrá utilizar el escaner de código de barras
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    private void scannerBarCode() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            IntentIntegrator integrator = new IntentIntegrator(Add_product.this);
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
+            integrator.setPrompt("Scan");
+            integrator.setCameraId(0);
+            integrator.setBeepEnabled(false);
+            integrator.setBarcodeImageEnabled(false);
+            integrator.initiateScan();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Add_product.this);
+            builder.setTitle("Escaner no disponible");
+            builder.setMessage("El escaner no esta disponible para su versión de móvil");
+            scanBtn.setEnabled(false);
+        }
     }
 
     private void takePintureIntent(){
@@ -371,9 +387,6 @@ public class Add_product extends AppCompatActivity {
 
     private boolean myRequestStoragePermission(){
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            return true;
-        }
         if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
             return true;

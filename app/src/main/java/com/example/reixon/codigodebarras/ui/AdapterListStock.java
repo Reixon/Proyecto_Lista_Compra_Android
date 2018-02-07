@@ -36,7 +36,7 @@ import java.util.List;
     private ArrayList<Producto> searchList;
     private ViewHolder holder = null;
     private List<Producto> proList;
-    private lista_productos context;
+    private Lista_productos context;
     private MySQL mysql;
     private SQLiteDatabase db;
     private boolean [] itemChecks;
@@ -47,7 +47,7 @@ import java.util.List;
                             ArrayList<Producto> listaProductosDada) {
         proList = listaProductosDada;
         searchList = listaProductosDada;
-        this.context = (lista_productos) context;
+        this.context = (Lista_productos) context;
         mysql = new MySQL(context);
         itemChecks = new boolean[listaProductosDada.size()];
         numChecks=0;

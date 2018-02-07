@@ -42,7 +42,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class lista_productos extends AppCompatActivity {
+public class Lista_productos extends AppCompatActivity {
 
     private AdapterListStock adapterListPro;
     private ArrayList<String> listaSuperNombre;
@@ -148,7 +148,7 @@ public class lista_productos extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(v.getId()==R.id.bt_scanner_search) {
-                    IntentIntegrator integrator = new IntentIntegrator(lista_productos.this);
+                    IntentIntegrator integrator = new IntentIntegrator(Lista_productos.this);
                     integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
                     integrator.setPrompt("Escaneo");
                     integrator.setCameraId(0);
@@ -217,10 +217,10 @@ public class lista_productos extends AppCompatActivity {
             adapterListPro.vaciarArrayCheck();
 
             if(b){
-                Toast.makeText(lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
             }
             else {
-                Toast.makeText(lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
             }
             }
@@ -283,7 +283,7 @@ public class lista_productos extends AppCompatActivity {
 
                 b.putSerializable("Producto", p);
                 b.putSerializable("Lista Supers",arraySupers);
-                Intent intentViewProduct= new Intent(lista_productos.this, ViewProduct.class);
+                Intent intentViewProduct= new Intent(Lista_productos.this, ViewProduct.class);
                 intentViewProduct.putExtras(b);
                 startActivityForResult(intentViewProduct,LOAD_DATA_MYSQL);
 
@@ -375,11 +375,11 @@ public class lista_productos extends AppCompatActivity {
                             try {
                                 p = new ProcessJSON(this).execute(result.getContents().toString()).get();
                                 if (p != null) {
-                                    Intent i = new Intent(lista_productos.this, Add_product.class);
+                                    Intent i = new Intent(Lista_productos.this, Add_product.class);
                                     i.putExtra("Producto_scanner_internet", p);
                                     startActivityForResult(i,LOAD_DATA_MYSQL);
                                 } else {
-                                    Intent i = new Intent(lista_productos.this, Add_product.class);
+                                    Intent i = new Intent(Lista_productos.this, Add_product.class);
                                     i.putExtra("CODIGO", result.getContents());
                                     startActivityForResult(i,LOAD_DATA_MYSQL);
                                 }
@@ -455,14 +455,14 @@ public class lista_productos extends AppCompatActivity {
                     }
                     }
                 };
-                AlertDialog.Builder dialog = new AlertDialog.Builder(lista_productos.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(Lista_productos.this);
                 dialog.setMessage("¿Quieres eliminarlo?").setPositiveButton("Si",
                         dialogClick).setNegativeButton("No",dialogClick).show();
             return true;
             case R.id.action_settings:
-               /* Intent i = new Intent(lista_productos.this, SettingsActivity.class);
+               /* Intent i = new Intent(Lista_productos.this, SettingsActivity.class);
                 startActivity(i);
-                Toast.makeText(lista_productos.this,"opciones",Toast.LENGTH_SHORT);*/
+                Toast.makeText(Lista_productos.this,"opciones",Toast.LENGTH_SHORT);*/
                 return true;
 
         }

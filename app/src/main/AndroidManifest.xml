@@ -58,7 +58,7 @@
             android:name=".ui.Add_product"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.lista_productos"
+            android:name=".ui.Lista_productos"
             android:label="@string/title_activity_stock_product"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -68,7 +68,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.lista_compra"
+            android:name=".ui.Lista_compra"
             android:label="@string/title_aplication"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"

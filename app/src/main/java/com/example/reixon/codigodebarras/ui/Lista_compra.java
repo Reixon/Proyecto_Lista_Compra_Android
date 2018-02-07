@@ -4,6 +4,8 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +13,7 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -55,7 +58,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class lista_compra extends AppCompatActivity {
+public class Lista_compra extends AppCompatActivity {
 
     private AdapterListBuyProd adapterListCom = null;
     private ArrayList<Producto> listaProductosCompra;;
@@ -72,15 +75,14 @@ public class lista_compra extends AppCompatActivity {
     private static final int LOAD_DATA_MYSQL=100;
     private PowerManager pm;
     private PowerManager.WakeLock wakelock;
-    private AccountManager mAccountManager;
-    private String token;
+
 
     private AccountManagerCallback<Bundle> mGetAuthTokenCallback =
             new AccountManagerCallback<Bundle>() {
                 @Override
                 public void run(final AccountManagerFuture<Bundle> arg0) {
                     try {
-                        token = (String) arg0.getResult().get(AccountManager.KEY_AUTHTOKEN);
+                        String token = (String) arg0.getResult().get(AccountManager.KEY_AUTHTOKEN);
                     } catch (Exception e) {
                         // handle error
                     }
@@ -91,7 +93,7 @@ public class lista_compra extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ContentResolver resolver = getContentResolver();
-        mAccountManager = (AccountManager) getSystemService(
+        AccountManager mAccountManager = (AccountManager) getSystemService(
                 ACCOUNT_SERVICE);
         Account[] accounts = mAccountManager.getAccountsByType(AccountAuthenticator.ACCOUNT_TYPE);
         if (accounts.length != 0){
@@ -119,11 +121,13 @@ public class lista_compra extends AppCompatActivity {
         loadData=false;
         menu_active=false;
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_lista_compra);
+        Toolbar toolbar = findViewById(R.id.toolbar_lista_compra);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -132,9 +136,9 @@ public class lista_compra extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        /******
+        /*********************
          * LOAD DATA SQLite
-         * ******************************/
+         * *******************/
         mysql = new MySQL(this);
         db = mysql.getReadableDatabase();
         arraySupers = mysql.cargarSuperMercadosBD(db);
@@ -195,7 +199,7 @@ public class lista_compra extends AppCompatActivity {
                     case R.id.nav_listBuy:
                         b.putSerializable("Lista Supers",arraySupers);
                         //  bundle.putStringArrayList("Name_Supers",arrayNombreSupers);
-                        i = new Intent(lista_compra.this, Admin_list.class);
+                        i = new Intent(Lista_compra.this, Admin_list.class);
                         i.putExtras(b);
                         startActivityForResult(i,LOAD_DATA_MYSQL);
                         break;
@@ -203,20 +207,20 @@ public class lista_compra extends AppCompatActivity {
                         b.putSerializable("Lista Supers", arraySupers);
                         b.putSerializable("Full Products", productoTotal);
                         b.putSerializable("Array Categories", arrayCategories);
-                        i = new Intent(lista_compra.this, lista_productos.class);
+                        i = new Intent(Lista_compra.this, Lista_productos.class);
                         i.putExtras(b);
                         startActivity(i);
                         break;
                     case R.id.nav_categories:
                         b.putSerializable("Array Categories",arrayCategories);
-                        i = new Intent(lista_compra.this, Admin_Category.class);
+                        i = new Intent(Lista_compra.this, Admin_Category.class);
                         i.putExtras(b);
                         startActivityForResult(i,LOAD_DATA_MYSQL);
                         break;
                     case R.id.nav_history:
                         break;
                     case R.id.nav_account:
-                        i = new Intent(lista_compra.this,Admin_account.class);
+                        i = new Intent(Lista_compra.this,Admin_account.class);
                         b.putSerializable("Array Users", userAccounts);
                         i.putExtras(b);
                         startActivityForResult(i,LOAD_DATA_MYSQL);
@@ -246,7 +250,7 @@ public class lista_compra extends AppCompatActivity {
                 b.putSerializable("Producto", p);
                 b.putSerializable("SuperMercado",arraySupers.get(spinner.getSelectedItemPosition()));
                 b.putBoolean("LISTA_COMPRA",true);
-                Intent intentViewProduct= new Intent(lista_compra.this, ViewProduct.class);
+                Intent intentViewProduct= new Intent(Lista_compra.this, ViewProduct.class);
                 intentViewProduct.putExtras(b);
                 startActivityForResult(intentViewProduct,LOAD_DATA_MYSQL);
             }
@@ -273,13 +277,7 @@ public class lista_compra extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(v.getId()==R.id.bt_scanner_search) {
-                    IntentIntegrator integrator = new IntentIntegrator(lista_compra.this);
-                    integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
-                    integrator.setPrompt("Escaneo");
-                    integrator.setCameraId(0);
-                    integrator.setBeepEnabled(false);
-                    integrator.setBarcodeImageEnabled(true);
-                    integrator.initiateScan();
+                    scannerBarCode();
                 }
             }
         });
@@ -345,6 +343,29 @@ public class lista_compra extends AppCompatActivity {
         wakelock.acquire();
 
     }
+
+
+    /**
+     * Si el la versión del movil es 23+ podrá utilizar el escaner de código de barras
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    private void scannerBarCode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            IntentIntegrator integrator = new IntentIntegrator(Lista_compra.this);
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
+            integrator.setPrompt("Scan");
+            integrator.setCameraId(0);
+            integrator.setBeepEnabled(false);
+            integrator.setBarcodeImageEnabled(false);
+            integrator.initiateScan();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Lista_compra.this);
+            builder.setTitle("Escaner no disponible");
+            builder.setMessage("El escaner no esta disponible para su versión de móvil");
+            ImageButton btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
+            btCode.setEnabled(false);
+        }
+    }
     /**
      * Escucha los cambios que hayan en
      * {@link com.example.reixon.codigodebarras.sync.ListShopsProvider}.
@@ -394,7 +415,7 @@ public class lista_compra extends AppCompatActivity {
             for(int i=0; i<arraySupers.size(); i++){
                 arrayNombreSupers.add(arraySupers.get(i).getNombre());
             }
-            spinner_super.setAdapter(new ArrayAdapter<>(lista_compra.this,
+            spinner_super.setAdapter(new ArrayAdapter<>(Lista_compra.this,
                     android.R.layout.simple_list_item_1, arrayNombreSupers));
             arrayNameCategories = new ArrayList<>();
             for(int i=0; i<arrayNameCategories.size(); i++){
@@ -491,7 +512,7 @@ public class lista_compra extends AppCompatActivity {
                             }
                         }
                     } else {/*PRODUCTO NO EXISTE EN LA BD*/
-                        Intent i = new Intent(lista_compra.this, Add_product.class);
+                        Intent i = new Intent(Lista_compra.this, Add_product.class);
                         i.putExtra("Add_lista","");
                         i.putExtra("SuperMercado",sp);
                         try {
@@ -502,7 +523,7 @@ public class lista_compra extends AppCompatActivity {
                             }
                             else{
                                 i.putExtra("CODIGO", result.getContents());
-                                Toast.makeText(lista_compra.this,"Producto no encontrado en Internet",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Lista_compra.this,"Producto no encontrado en Internet",Toast.LENGTH_SHORT).show();
                                 startActivityForResult(i,LOAD_DATA_MYSQL);
                             }
                         } catch (InterruptedException e) {
@@ -565,7 +586,7 @@ public class lista_compra extends AppCompatActivity {
                 break;
             case R.id.menu_share_list:
                 chooseShared();
-                //Toast.makeText(lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
+                //Toast.makeText(Lista_productos.this,"COMPARTIR",Toast.LENGTH_SHORT);
                 return true;
             case R.id.menu_masOpciones:
 
@@ -577,7 +598,7 @@ public class lista_compra extends AppCompatActivity {
     public void chooseShared(){
         final CharSequence [] option ={"Enviar", "Enviar como texto"};
         final android.app.AlertDialog.Builder builder =
-                new android.app.AlertDialog.Builder(lista_compra.this);
+                new android.app.AlertDialog.Builder(Lista_compra.this);
         builder.setTitle("Selecciona una opcion");
         builder.setItems(option, new DialogInterface.OnClickListener() {
 
@@ -588,7 +609,7 @@ public class lista_compra extends AppCompatActivity {
                     case 0:
                         sendList();
                        // if(usersAccounts==null) {
-                       /*     Intent i = new Intent(lista_compra.this, Admin_account.class);
+                       /*     Intent i = new Intent(Lista_compra.this, Admin_account.class);
                             startActivity(i);*/
                       /*  }else{
 
@@ -610,9 +631,9 @@ public class lista_compra extends AppCompatActivity {
     public void sendList(){
 
         final android.app.AlertDialog.Builder builder =
-                new android.app.AlertDialog.Builder(lista_compra.this);
+                new android.app.AlertDialog.Builder(Lista_compra.this);
         builder.setTitle("Selecciona una opcion");
-        final EditText edit = new EditText(lista_compra.this);
+        final EditText edit = new EditText(Lista_compra.this);
         builder.setView(edit);
         builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
             @Override
@@ -624,7 +645,7 @@ public class lista_compra extends AppCompatActivity {
                     //si exite compartir lista
                 }
                 else{
-                    Toast.makeText(lista_compra.this,"Introduce el correo electronico",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Lista_compra.this,"Introduce el correo electronico",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -641,7 +662,7 @@ public class lista_compra extends AppCompatActivity {
             sendIntent.putExtra(Intent.EXTRA_TEXT, "text/plain");
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
-            Toast.makeText(lista_compra.this,"Datos compartidos",Toast.LENGTH_SHORT);
+            Toast.makeText(Lista_compra.this,"Datos compartidos",Toast.LENGTH_SHORT);
         } catch (Exception e) {
             e.printStackTrace();
         }
