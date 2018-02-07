@@ -69,8 +69,8 @@ public class Admin_account extends AppCompatActivity {
                 Bundle b = new Bundle();
                 switch (position){
                     case 0:
-                        //i = new Intent(Admin_account.this, NewAcount.class);
-                        //startActivity(i);
+                        i = new Intent(Admin_account.this, NewAcount.class);
+                        startActivity(i);
                         break;
                     case 1:
                         i = new Intent(Admin_account.this, Account_manage.class);
