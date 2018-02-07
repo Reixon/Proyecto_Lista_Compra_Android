@@ -35,7 +35,7 @@ public class AdapterListBuyProd extends BaseAdapter {
     private ViewHolder holder;
     private List<Producto> proList;
     private MySQL mysql;
-    private lista_compra context;
+    private Lista_compra context;
     private SQLiteDatabase db;
     private SuperMercado sp;
     private boolean [] itemChecks;
@@ -47,7 +47,7 @@ public class AdapterListBuyProd extends BaseAdapter {
     public AdapterListBuyProd(Context context,
             int textViewResourceId, ArrayList<Producto> listaProductosDada,SuperMercado sp,
                               ArrayList<String> txtList) {
-        this.context = (lista_compra) context;
+        this.context = (Lista_compra) context;
         proList = listaProductosDada;
         mtxtList = txtList;
         searchList = listaProductosDada;
