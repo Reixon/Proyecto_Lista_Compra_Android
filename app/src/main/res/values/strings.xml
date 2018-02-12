@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Codigo de barras</string>
+    <string name="app_name">TFG - Lista de compra</string>
     <string name="action_settings">Setting</string>
     <string name="btnScan">Scan</string>
     <string name="txtbtnQRcode">Lector de QR Code</string>
@@ -20,9 +20,14 @@
     <string name="descriptionPhotoBt">Photo Button</string>
 
     <!--View Product-->
-    <string name="etName">Introduce el nombre del producto</string>
+    <string name="etName">Introduce el name del producto</string>
     <string name="etPrice">Precio</string>
     <string name="etQuantity">Cantidad</string>
+    <string name="et_categoria">Categoria</string>
+    <string name="et_total">Total:</string>
+    <string name="bt_anyadir_listbuy">Añadir</string>
+    <string name="todo">TODO</string>
+    <string name="et_unidad">Unidad</string>
 
     <!--menu_product-->
     <string name="Aceptar">Aceptar</string>
@@ -124,6 +129,13 @@
     <string name="change_password_action_change">Cambiar contraseña</string>
     <string name="change_password_new_password">Nueva Contraseña</string>
 
+    <!--Elegir Log o Crear-->
+    <string name="create_new_account">Crear nueva cuenta</string>
+    <string name="login_account">Iniciar cuenta</string>
+
+    <!--Crear cuenta-->
+    <string name="add_create_new_account">Añadir nueva cuenta</string>
+
     <!-- Strings related to login AND create-->
     <string name="prompt_user">Nombre</string>
     <string name="prompt_email">Email</string>
@@ -144,8 +156,12 @@
 
     <!-- NAVIGATE DRAWER-->
     <string name="title_activity_menu_navigate">menu_navigate</string>
-
+    <string name="navigation_drawer_user_name">Usuario</string>
+    <string name="navigation_drawer_user_email">Email</string>
+    <string name="navigation_drawer_context_description">Imagen de cuenta de usuario</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_navigation_drawer">NavigationDrawer</string>
+
+
 </resources>

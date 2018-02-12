@@ -52,12 +52,8 @@ public class SuperMercado implements Serializable {
         this.numProductosComprados = numProductosComprados;
     }
 
-    public void anyadirProducto(Producto p)
-    {
-        productos.add(p);
-    }
 
-    public void eliminarProducto(int pos){
+    public void removeProduct(int pos){
         productos.remove(pos);
     }
 

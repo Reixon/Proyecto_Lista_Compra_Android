@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferencias_principal">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="wake_lock"
+        android:title="Mantener pantalla encedida" />
+    <EditTextPreference
+        android:defaultValue="€"
+        android:key="money"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Cambiar tipo de moneda"
+        />
+</PreferenceScreen>

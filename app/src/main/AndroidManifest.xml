@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS"
+        android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS"
+        android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -49,12 +55,6 @@
             android:screenOrientation="portrait"/>
         -->
         <activity
-            android:name=".ui.activity_list_products_expanable"
-            android:label="@string/title_activity_stock_product"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
             android:name=".ui.Add_product"
             android:screenOrientation="portrait" />
         <activity
@@ -92,11 +92,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.NewAcount"
+            android:name=".ui.ChooseLog"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.Login"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -105,16 +105,18 @@
         <activity
             android:name=".ui.Account_manage"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.PreferenciasActivity" />
 
-        <service android:name=".sync.SyncService">
+        <service android:name=".sync.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" /> <!-- We haven't defined this -->
+                android:resource="@xml/authenticator" />
         </service>
+
+
         <!--
             <provider
             android:authorities="com.example.reixon.codigodebarras"
@@ -144,7 +146,7 @@
         </service>
         -->
 
-        <activity android:name=".ui.ChangePassword"></activity>
+
     </application>
 
 </manifest>

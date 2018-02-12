@@ -21,12 +21,11 @@ public class ProcessJSON  extends AsyncTask<String, Void, Producto> {
         progressDialog = new ProgressDialog(activity);
     }
 
- /*   @Override
+    @Override
     protected void onPreExecute() {
-        progressDialog = ProgressDialog.show(null,
-                "ProgressDialog",
-                "Wait for "+time+ " seconds");
-    }*/
+        this.progressDialog.setMessage("Buscando producto...");
+        this.progressDialog.show();
+    }
 
     @Override
     protected Producto doInBackground(String... params) {
@@ -42,7 +41,7 @@ public class ProcessJSON  extends AsyncTask<String, Void, Producto> {
             try{
                 JSONObject reader = new JSONObject(stream);
                 JSONObject prod = reader.getJSONObject("product");
-                String name = prod.getString("brands");
+                String name = prod.getString("product_name_en");
                 if(!prod.getString("quantity").equals("")) {
                     String quantity = prod.getString("quantity");
                 }

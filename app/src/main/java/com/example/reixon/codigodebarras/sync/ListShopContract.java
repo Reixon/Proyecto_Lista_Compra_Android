@@ -22,26 +22,13 @@ public class ListShopContract {
             "/vnd.com.example.reixon.provider.listshops";
     public static final String URI_TYPE_LISTSHOP_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE+
             "/vnd.com.example.reixon.provider.listshops";
-    public static final String URI_TYPE_PRODUCTS_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE+
-            "/vnd.com.example.reixon.provider.products";
-    public static final String URI_TYPE_PRODUCTS_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE+
-            "/vnd.com.example.reixon.provider.products";
 
     public static final class ListShopsColumns implements BaseColumns{
 
         private ListShopsColumns(){}
         public static final String NAME ="name";
         public static final String ID_CLOUD = "idcloud";
-    }
-    public static final class ProductsColumns implements BaseColumns{
 
-        private ProductsColumns(){}
-        public static final String NAME ="name";
-        public static final String PRICE ="price";
-        public static final String PATH_IMAGE ="pathImage";
-        public static final String CODE_BAR ="codeBar";
-        public static final String CATEGORY ="category";
-        public static final String UNITY ="unity";
-        public static final String ID_CLOUD = "idcloud";
+        public static final String DEFAULT_SORT_ORDER = ID_CLOUD + " ASC";
     }
 }

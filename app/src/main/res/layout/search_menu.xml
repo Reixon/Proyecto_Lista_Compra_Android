@@ -33,7 +33,8 @@
             android:background="@android:color/background_light"
             android:contentDescription="@string/descriptionBtOk"
             android:layout_marginEnd="50dp"
-            app:srcCompat="@drawable/icon_ok" />
+            app:srcCompat="@drawable/icon_ok"
+            android:layout_marginRight="50dp" />
 
         <ImageButton
             android:id="@+id/bt_scanner_search"
@@ -42,7 +43,8 @@
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="50dp"
             android:background="@android:color/background_light"
-            app:srcCompat="@drawable/icon_codebar" />
+            app:srcCompat="@drawable/icon_codebar"
+            android:layout_marginRight="50dp" />
 
         <ImageButton
             android:id="@+id/bt_cross_menu_search"

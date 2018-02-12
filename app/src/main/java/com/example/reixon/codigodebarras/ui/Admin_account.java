@@ -69,7 +69,7 @@ public class Admin_account extends AppCompatActivity {
                 Bundle b = new Bundle();
                 switch (position){
                     case 0:
-                        i = new Intent(Admin_account.this, NewAcount.class);
+                        i = new Intent(Admin_account.this, ChooseLog.class);
                         startActivity(i);
                         break;
                     case 1:
@@ -94,26 +94,9 @@ public class Admin_account extends AppCompatActivity {
         });
     }
 
-    public void selecctAccount(ArrayList<String>userAccountsString){
+    public void selecctAccount(ArrayList<String> userAccountsString){
         AlertDialog.Builder builder = new AlertDialog.Builder(Admin_account.this);
         builder.setTitle("Seleccionar Cuenta ");
-
-       /* builder.setSingleChoiceItems(userAccountsString, ,new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int item) {
-
-
-
-            }
-        });
-        builder.create();
-        builder.show();
-
-
-
-
-        builder.show();*/
-
     }
 
     public class Adapter extends BaseAdapter {
@@ -158,11 +141,12 @@ public class Admin_account extends AppCompatActivity {
 
         @Override
         public boolean isEnabled(int position) {
+
             if(userAccounts.size()==0){
                 return position == 0;
             }
             else{
-                return true;
+                return position > 0;
             }
         }
 

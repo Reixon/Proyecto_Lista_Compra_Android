@@ -49,23 +49,26 @@ public class Lista_productos extends AppCompatActivity {
     private ArrayList<SuperMercado>arraySupers;
     private ArrayList<Producto>productoTotal;
     private ArrayList<Category>arrayCategories;
-    protected MySQL mysql;
-    protected SQLiteDatabase db;
     private boolean loadData, menu_active;
     private static final int LOAD_DATA_MYSQL=100;
-    protected PowerManager.WakeLock wakelock;
+    protected PowerManager.WakeLock pantallaEncendida;
+
+    private Button anyadirListBuy;
+    private Spinner spinnerSupers;
+    private ImageButton bt_speak, btCode, btOk, btCross;
+    private EditText txt_edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.full_productos_stock);
-        Button anyadirListBuy =(Button)findViewById(R.id.bt_anyadir_listaCompra);
-        Spinner spinnerSupers =(Spinner)findViewById(R.id.spinner_listSuper);
-        ImageButton bt_speak =(ImageButton)findViewById(R.id.bt_speak);
-        EditText txt_edit =(EditText)findViewById(R.id.txt_lista_productos);
-        ImageButton btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
-        ImageButton btOk = (ImageButton)findViewById(R.id.bt_ok_menu_search);
-        ImageButton btCross =(ImageButton)findViewById(R.id.bt_cross_menu_search);
+        anyadirListBuy =(Button)findViewById(R.id.bt_anyadir_listaCompra);
+        spinnerSupers =(Spinner)findViewById(R.id.spinner_listSuper);
+        bt_speak =(ImageButton)findViewById(R.id.bt_speak);
+        txt_edit =(EditText)findViewById(R.id.txt_lista_productos);
+        btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
+        btOk = (ImageButton)findViewById(R.id.bt_ok_menu_search);
+        btCross =(ImageButton)findViewById(R.id.bt_cross_menu_search);
 
         txt_edit.clearFocus();
         txt_edit.setSingleLine();
@@ -77,16 +80,15 @@ public class Lista_productos extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mysql = new MySQL(this);
         anyadirListBuy.setVisibility(View.GONE);
         spinnerSupers.setVisibility(View.GONE);
         loadData = false;
         menu_active=false;
 
         final PowerManager pm=(PowerManager)getSystemService(Context.POWER_SERVICE);
-        this.wakelock=pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
+        this.pantallaEncendida =pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "etiqueta");
         Toast.makeText(this, "La pantalla se mantendrá encendida hasta pasar de pantalla.", Toast.LENGTH_SHORT).show();
-        wakelock.acquire();
+        pantallaEncendida.acquire();
 
 
         Bundle b = getIntent().getExtras();
@@ -129,6 +131,7 @@ public class Lista_productos extends AppCompatActivity {
                     insertarProducto(txt_edit.getText().toString());
                     txt_edit.clearFocus();
                     txt_edit.setText("");
+                    setResult(RESULT_OK);
                 }
             }
         });
@@ -164,11 +167,12 @@ public class Lista_productos extends AppCompatActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
 
                 if((keyCode == KeyEvent.KEYCODE_ENTER)&& event.getAction()== KeyEvent.ACTION_DOWN){
-                        EditText txt = (EditText)v;
-                        String nombre = txt.getText().toString();
-                        adapterListPro.anyadirProducto(nombre);
-                        txt.clearFocus();
-                        txt.setText("");
+                    EditText txt = (EditText)v;
+                    String nombre = txt.getText().toString();
+                    insertarProducto(nombre);
+                    txt.clearFocus();
+                    txt.setText("");
+                    setResult(RESULT_OK);
                 }
                 return false;
             }
@@ -181,48 +185,50 @@ public class Lista_productos extends AppCompatActivity {
             Spinner spinnerSupers = (Spinner)findViewById(R.id.spinner_listSuper);
             ArrayList<Producto> productos =  arraySupers.get(spinnerSupers.getSelectedItemPosition()).getProductos();
             int numP= productos.size();
-            String nombre="";
+            String name_add="";
             boolean b= false;
+            MySQL mysql = MySQL.getInstance(getApplicationContext());
+            SQLiteDatabase db;
             for(int i = 0; i< checks.length; i++) {
                 if(checks[i]) {
                     if(numP>0){
+                        /*
+                        * Si el producto ya existe en al lista devolvemos true
+                        * **/
                         for(int x=0;x<numP; x++) {
-                            if (productos.get(x).getId() != productoTotal.get(i).getId()) {
-
-                            } else {
-                                nombre += productoTotal.get(i).getNombre() + ", ";
+                            if (productos.get(x).getId() == productoTotal.get(i).getId()) {
                                 b = true;
                                 break;
                             }
                         }
                         if(!b){
                             db = mysql.getWritableDatabase();
-                            mysql.add_Producto_A_Lista_SuperMercado(db,
+                            mysql.anyadir_Producto_A_Lista_SuperMercado(db,
                                     arraySupers.get(spinnerSupers.getSelectedItemPosition()),
                                     productoTotal.get(i));
                             arraySupers.get(spinnerSupers.getSelectedItemPosition()).
                                     addProduct(productoTotal.get(i));
+                            name_add+=productoTotal.get(i).getName()+", ";
+
                         }
                     }else{
                         db = mysql.getWritableDatabase();
-                        mysql.add_Producto_A_Lista_SuperMercado(db,
+                        mysql.anyadir_Producto_A_Lista_SuperMercado(db,
                                 arraySupers.get(spinnerSupers.getSelectedItemPosition()),
                                 productoTotal.get(i));
                         arraySupers.get(spinnerSupers.getSelectedItemPosition()).
                                 addProduct(productoTotal.get(i));
+                        name_add+=productoTotal.get(i).getName()+", ";
                     }
                 }
+                b=false;
             }
             setVisibleMenusActive(false);
             adapterListPro.vaciarArrayCheck();
-
-            if(b){
-                Toast.makeText(Lista_productos.this, nombre+" ya esta en la lista", Toast.LENGTH_SHORT).show();
+            if(!name_add.equals("")) {
+                Toast.makeText(Lista_productos.this, name_add + " Añadido", Toast.LENGTH_SHORT).show();
             }
-            else {
-                Toast.makeText(Lista_productos.this, "Añadido", Toast.LENGTH_SHORT).show();
-                setResult(RESULT_OK);
-            }
+            setResult(RESULT_OK);
             }
         });
 
@@ -234,12 +240,7 @@ public class Lista_productos extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Spinner spinnerSupers = (Spinner)findViewById(R.id.spinner_listSuper);
-                Button anyadirListBuy =(Button)findViewById(R.id.bt_anyadir_listaCompra);
-                ImageButton btCode = (ImageButton)findViewById(R.id.bt_scanner_search);
-                ImageButton btOk = (ImageButton)findViewById(R.id.bt_ok_menu_search);
-                ImageButton btCross =(ImageButton)findViewById(R.id.bt_cross_menu_search);
-                ImageButton bt_speak =(ImageButton)findViewById(R.id.bt_speak);
+
 
                 if(spinnerSupers.getVisibility()==View.VISIBLE && anyadirListBuy.getVisibility()==View.VISIBLE) {
                     spinnerSupers.setVisibility(View.GONE);
@@ -278,7 +279,7 @@ public class Lista_productos extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int pos,
                                     long id) {
-                Producto p = adapterListPro.getSearchList().get(pos);
+                Producto p = productoTotal.get(pos);
                 Bundle b = new Bundle();
 
                 b.putSerializable("Producto", p);
@@ -292,31 +293,29 @@ public class Lista_productos extends AppCompatActivity {
 
     }
 
-    public void setProductosTotales(ArrayList<Producto> p){
-        productoTotal = p;
-    }
-
-    public ArrayList<Producto> getProductosTotales(){
-        return productoTotal;
-    }
-
     public void insertarProducto(String txt){
-        adapterListPro.anyadirProducto(txt);
-        loadData=true;
+        MySQL mysql = MySQL.getInstance(this);
+        SQLiteDatabase db = mysql.getWritableDatabase();
+        mysql.insertProducto(txt, "0","","",1,0,db);
+        this.productoTotal = mysql.cargarProductos(db);
+        Toast.makeText(this, txt +" creado", Toast.LENGTH_SHORT).show();
+        adapterListPro.updateList(productoTotal);
     }
 
-    public void deleteProductCheck(){
+    public void eliminarProductCheck(){
         String nombres="";
         boolean[] itemChecks = adapterListPro.getItemCheck();
+        MySQL mysql = MySQL.getInstance(getApplicationContext());
+        SQLiteDatabase db;
         for(int i=0; i<productoTotal.size(); i++){
-            if(itemChecks[i]==true) {
+            if(itemChecks[i]) {
                 db = mysql.getWritableDatabase();
                 mysql.eliminarProducto(productoTotal.get(i).getId(), db);
-                nombres = nombres + "\n" + productoTotal.get(i).getNombre();
+                nombres = nombres + "\n" + productoTotal.get(i).getName();
             }
         }
         db = mysql.getReadableDatabase();
-        productoTotal = mysql.loadFullProduct(db);
+        productoTotal = mysql.cargarProductos(db);
 
         Toast.makeText(this, nombres+" eliminado", Toast.LENGTH_SHORT).show();
         this.setVisibleMenusActive(false);
@@ -326,8 +325,9 @@ public class Lista_productos extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if(loadData){
-            db = mysql.getWritableDatabase();
-            productoTotal = mysql.loadFullProduct(db);
+            MySQL mysql = MySQL.getInstance(getApplicationContext());
+            SQLiteDatabase db = mysql.getWritableDatabase();
+            productoTotal = mysql.cargarProductos(db);
             arraySupers = mysql.cargarSuperMercadosBD(db);
             loadData=false;
             adapterListPro.setList(productoTotal);
@@ -355,10 +355,11 @@ public class Lista_productos extends AppCompatActivity {
                     if (result.getContents() == null) {
                         Toast.makeText(this, "Escaneo cancelado", Toast.LENGTH_SHORT).show();
                     } else {
-                        db = mysql.getWritableDatabase();
-                        Producto p = mysql.searchProductoWithCode(result.getContents(), db);
+                        MySQL mysql = MySQL.getInstance(getApplicationContext());
+                        SQLiteDatabase db = mysql.getWritableDatabase();
+                        Producto p = mysql.buscarProductoPorCodigo(result.getContents(), db);
                         if (p != null) {
-                            if (p.getNombre().equals("")) {
+                            if (p.getName().equals("")) {
                                 Toast.makeText(this, "VACIO", Toast.LENGTH_SHORT).show();
                             } else {
                                 try {
@@ -417,8 +418,7 @@ public class Lista_productos extends AppCompatActivity {
 
 
     public void setVisibleMenusActive(Boolean b){
-        Button anyadirListBuy =(Button)findViewById(R.id.bt_anyadir_listaCompra);
-        Spinner spinnerSupers =(Spinner)findViewById(R.id.spinner_listSuper);
+
         if(b){
             anyadirListBuy.setVisibility(View.VISIBLE);
             spinnerSupers.setVisibility(View.VISIBLE);
@@ -445,7 +445,7 @@ public class Lista_productos extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
-                            deleteProductCheck();
+                            eliminarProductCheck();
                             ListView listView = (ListView) findViewById(R.id.listaProductos);
                             listView.invalidate();
                             break;
@@ -525,20 +525,20 @@ public class Lista_productos extends AppCompatActivity {
             product = new JSONObject();
             for(int i=0; i<this.productoTotal.size(); i++){
                 product = new JSONObject();
-                product.put("name", productoTotal.get(i).getNombre());
-                product.put("price", productoTotal.get(i).getPrecio());
-                //product.put("image", productoTotal.get(i).getRutaImagen());
+                product.put("name", productoTotal.get(i).getName());
+                product.put("price", productoTotal.get(i).getPrice());
+                //product.put("image", productoTotal.get(i).getImagePath());
                 //imagen pasarla a bytes o no pasarla
-                product.put("codigo", productoTotal.get(i).getCodigo());
+                product.put("codigo", productoTotal.get(i).getCode());
                 for(int x =0; x<arrayCategories.size(); x++){
-                    if(arrayCategories.get(x).getId()== productoTotal.get(i).getCategoria()){
+                    if(arrayCategories.get(x).getId()== productoTotal.get(i).getCategory()){
                         category = new JSONObject();
                         category.put("name", arrayCategories.get(x).getNombre());
                         product.put("category", category);
                     }
                 }
-                product.put("quantity", productoTotal.get(i).getCantidad());
-                product.put("unity",productoTotal.get(i).getUnidad());
+                product.put("quantity", productoTotal.get(i).getQuantity());
+                product.put("unity",productoTotal.get(i).getUnity());
                 arrayProducts.put(product);
             }
 

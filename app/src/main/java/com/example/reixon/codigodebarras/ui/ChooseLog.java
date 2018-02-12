@@ -9,7 +9,7 @@ import android.widget.Button;
 
 import com.example.reixon.codigodebarras.R;
 
-public class NewAcount extends AppCompatActivity {
+public class ChooseLog extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class NewAcount extends AppCompatActivity {
         btNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(NewAcount.this, CreateUser.class);
+                Intent i = new Intent(ChooseLog.this, CreateUser.class);
                 startActivity(i);
             }
         });
@@ -43,7 +43,7 @@ public class NewAcount extends AppCompatActivity {
         btExist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(NewAcount.this, LoginActivity.class);
+                Intent i = new Intent(ChooseLog.this, Login.class);
                 startActivity(i);
             }
         });

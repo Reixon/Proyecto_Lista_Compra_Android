@@ -5,7 +5,6 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -42,16 +41,17 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 public class CreateUser extends AccountAuthenticatorActivity {
 
 
-    private CheckUser mAuthTask = null;
+    private CheckUser checkUserTask;
+    private RegisterUser registerUserTask;
     private EditText mNameView, mPasswordView, mEmailView;
     private View mProgressView;
     private View mLoginFormView;
     private AccountManager mAccountManager;
 
-    public static final String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
+   /* public static final String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public static final String ARG_AUTH_TYPE = "AUTH_TYPE_CODIGO_BARRAS";
     public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
-    public static final String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
+    public static final String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";*/
     public static final String PARAM_USER_PASS = "USER_PASS";
     public static final String PARAM_USER_NAME ="USER_NAME";
 
@@ -67,18 +67,18 @@ public class CreateUser extends AccountAuthenticatorActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress_register);
         mAccountManager = AccountManager.get(this);
-
+        checkUserTask=null;
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attempRegister();
+                intentarRegistrar();
 
             }
         });
     }
 
-    private void attempRegister() {
-        if (mAuthTask != null) {
+    private void intentarRegistrar() {
+        if (checkUserTask != null) {
             return;
         }
         // Reset errors.
@@ -117,7 +117,7 @@ public class CreateUser extends AccountAuthenticatorActivity {
             focusView = mEmailView;
             cancel = true;
         }
-        /*else if(mysql.searchUserEmail(email,db)){
+        /*else if(mysql.buscar_Email_Cuenta_Usuario(email,db)){
             mEmailView.setError(getString(R.string.error_this_account_exist));
             focusView = mEmailView;
             cancel = true;
@@ -130,11 +130,11 @@ public class CreateUser extends AccountAuthenticatorActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the result login attempt.
-            mAuthTask = new CheckUser(this.mEmailView.getText().toString(),this.mNameView.getText().toString());
+            checkUserTask = new CheckUser(this.mEmailView.getText().toString(),this.mNameView.getText().toString());
             try {
-                if(mAuthTask.execute((Void) null).get()){
-                    RegisterUser registerUser = new RegisterUser(this.mNameView.getText().toString(), mEmailView.getText().toString(),mPasswordView.getText().toString());
-                    registerUser.execute((Void)null);
+                if(checkUserTask.execute((Void) null).get()){
+                    registerUserTask= new RegisterUser(this.mNameView.getText().toString(), mEmailView.getText().toString(),mPasswordView.getText().toString());
+                    registerUserTask.execute((Void)null);
                 }
                 else{
                     Toast.makeText(this,getString(R.string.error_this_account_exist),Toast.LENGTH_LONG).show();
@@ -240,21 +240,20 @@ public class CreateUser extends AccountAuthenticatorActivity {
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
+            checkUserTask = null;
             showProgress(false);
         }
 
         @Override
         protected void onPostExecute(Boolean success){
             showProgress(false);
-            mAuthTask = null;
+            checkUserTask = null;
         }
     }
 
 
-
-
-    //Hilo de registro
+    /***************
+     ************Almacenar Usuario en la bd externa**************/
     public class RegisterUser extends AsyncTask<Void, String, String> {
 
         private final String mEmail;
@@ -342,7 +341,7 @@ public class CreateUser extends AccountAuthenticatorActivity {
 
         @Override
         protected void onPostExecute(String success) {
-            mAuthTask = null;
+            checkUserTask = null;
             showProgress(false);
             if (success.contentEquals("true")) {
                 String[] userParameters = this.result.split(" ");
@@ -373,13 +372,13 @@ public class CreateUser extends AccountAuthenticatorActivity {
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
+            checkUserTask = null;
             showProgress(false);
         }
     }
 
 
-    public void finishLog(Intent i){
+    private void finishLog(Intent i){
         String accountName = i.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String pass = i.getStringExtra(PARAM_USER_PASS);
         String name = i.getStringExtra(PARAM_USER_NAME);
@@ -387,13 +386,13 @@ public class CreateUser extends AccountAuthenticatorActivity {
         final Account account = new Account(accountName,i.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         String authToken = i.getStringExtra(AccountManager.KEY_AUTHTOKEN);
-        String authTokenType = LoginActivity.ARG_AUTH_TYPE;
+        String authTokenType = Login.ARG_AUTH_TYPE;
         mAccountManager.addAccountExplicitly(account,pass,null);
         mAccountManager.setAuthToken(account,authTokenType,authToken);
 
         MySQL mysql = new MySQL(this);
         SQLiteDatabase db = mysql.getWritableDatabase();
-        mysql.insertUser(name, accountName, authToken, db);
+        mysql.insertarUsuario(name, accountName, authToken, db);
 
         Toast.makeText(CreateUser.this,"Bienvenido "+
                 accountName,Toast.LENGTH_SHORT).show();
@@ -425,14 +424,9 @@ public class CreateUser extends AccountAuthenticatorActivity {
         return result.toString();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginFormView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
@@ -441,7 +435,6 @@ public class CreateUser extends AccountAuthenticatorActivity {
                     mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
-
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
@@ -451,8 +444,6 @@ public class CreateUser extends AccountAuthenticatorActivity {
                 }
             });
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }

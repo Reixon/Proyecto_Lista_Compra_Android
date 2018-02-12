@@ -38,8 +38,6 @@
             android:layout_margin="5dp"
             android:orientation="vertical"
             android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
             android:weightSum="1"
             tools:layout_editor_absoluteX="8dp"
@@ -55,10 +53,6 @@
                     android:id="@+id/imageProd"
                     android:layout_width="135dp"
                     android:layout_height="125dp"
-                    android:layout_alignBottom="@+id/btBarCode"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/etPhotoProd"
-                    android:layout_toStartOf="@+id/btBarCode"
                     android:background="@drawable/border"
                     android:src="@drawable/photo_icon" />
 
@@ -76,31 +70,29 @@
                         android:hint="@string/etName"
                         android:inputType="textCapSentences"
                         android:textAlignment="textStart"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:layout_gravity="start" />
 
                     <ImageButton
                         android:id="@+id/btBarCode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignStart="@+id/etBarCode"
-                        android:layout_below="@+id/etBarCode"
                         android:layout_weight="0.19"
                         android:background="@drawable/border"
-                        android:src="@drawable/icon_codebar" />
+                        android:src="@drawable/icon_codebar"
+                        android:contentDescription="@string/todo" />
 
                     <TextView
                         android:id="@+id/txtCodigo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_below="@+id/btBarCode"
                         android:layout_marginEnd="7dp"
                         android:layout_weight="0.52"
                         android:textAlignment="center"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:visibility="invisible" />
+                        android:visibility="invisible"
+                        android:layout_marginRight="7dp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -111,7 +103,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.73"
                     android:orientation="vertical">
@@ -120,7 +112,7 @@
                         android:id="@+id/textView2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Categoria"
+                        android:text="@string/et_categoria"
                         android:textSize="12sp" />
 
                     <Spinner
@@ -133,7 +125,7 @@
                     android:id="@+id/btEditCategoria"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/ic_menu_edit" />
+                    app:srcCompat="@android:drawable/ic_menu_edit" android:contentDescription="@string/todo" />
 
             </LinearLayout>
 
@@ -153,10 +145,10 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/etCoin"
+                    android:id="@+id/etMoneda_ViewP"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="€"
+                    android:text="@string/etEuro"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -166,16 +158,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_weight="1"
-                    android:text="Total:"
+                    android:text="@string/et_total"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layout_marginLeft="10dp" />
 
                 <TextView
                     android:id="@+id/txtPrecioTotalView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textAlignment="textStart" />
+                    android:textAlignment="textStart"
+                    android:gravity="start" />
 
             </LinearLayout>
 
@@ -195,7 +189,8 @@
                     android:maxLength="10"
                     android:textAlignment="textStart"
                     android:textSize="14sp"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    android:gravity="start" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -206,13 +201,13 @@
                         android:id="@+id/etUnity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Unidad"
+                        android:text="@string/et_unidad"
                         android:textSize="12sp" />
 
                     <Spinner
                         android:id="@+id/spinner_unidad"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
                         android:layout_weight="1" />
                 </LinearLayout>
 
@@ -239,7 +234,7 @@
 
             <Spinner
                 android:id="@+id/spinner_listSuper_proView"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
@@ -249,10 +244,10 @@
         <Button
             android:id="@+id/bt_anyadir_listaCompra_proView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="Añadir"
+            android:text="@string/bt_anyadir_listbuy"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="12sp"
             android:textStyle="bold" />

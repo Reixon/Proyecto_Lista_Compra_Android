@@ -9,13 +9,17 @@ import java.io.Serializable;
 public class UserAccount implements Serializable{
     private String name, email, mToken;
     private int id_user;
-    private boolean accountSelected;
 
+    public UserAccount(int id, String name, String email, String token) {
+        this.id_user=id;
+        this.name = name;
+        this.email = email;
+        this.mToken = token;
+    }
     public UserAccount(String name, String email, String token) {
         this.name = name;
         this.email = email;
         this.mToken = token;
-        accountSelected=false;
     }
 
     public String getName() {
@@ -30,23 +34,7 @@ public class UserAccount implements Serializable{
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public int getId_user() {
         return id_user;
-    }
-
-    public void setId_user(int id_user) {
-        this.id_user = id_user;
-    }
-
-    public boolean isAccountSeleccted() {
-        return accountSelected;
-    }
-
-    public void setAccountSeleccted(boolean accountSeleccted) {
-        this.accountSelected = accountSeleccted;
     }
 }

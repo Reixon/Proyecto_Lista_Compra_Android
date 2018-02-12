@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -36,10 +35,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.reixon.codigodebarras.Model.Category;
-import com.example.reixon.codigodebarras.Model.SuperMercado;
-import com.example.reixon.codigodebarras.db.MySQL;
 import com.example.reixon.codigodebarras.Model.Producto;
+import com.example.reixon.codigodebarras.Model.SuperMercado;
 import com.example.reixon.codigodebarras.R;
+import com.example.reixon.codigodebarras.db.MySQL;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -58,26 +57,16 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class Add_product extends AppCompatActivity {
 
-    private static String APP_DIRECTORY ="Imagenes_MyShop/";
     private final int SELECT_PICTURE =300;
     private final int MY_PERMISSIONS=100;
     private final int PHOTO_CODE=200;
-    private final int PIC_CROP=2;
 
     private Producto producto;
-    private Spinner spinner_categorias, spinnerUnidad;
-    private ImageButton scanBtn, btPhot, btCategoria;
-    private TextView txtScan;
-    private EditText txtNameProduct, txtPrecioProducto;
-    private ArrayList<String> arrayCategoriaN;
     private ArrayList<Category> arrayCategoria;
     private int unidadSelec;
     private String imagePath;
-    private ConstraintLayout layout;
-    private SQLiteDatabase db;
-    private MySQL mysql;
     private boolean addList;
-    private SuperMercado sp;
+    private SuperMercado superMerc;
     private boolean photo;
 
 
@@ -85,15 +74,14 @@ public class Add_product extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
-        txtNameProduct = (EditText) findViewById(R.id.txtNombre);
-        txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
-        scanBtn = (ImageButton) findViewById(R.id.btBarCode);
-        btPhot = (ImageButton) findViewById(R.id.btPhoto);
-        spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_add);
-        btCategoria = (ImageButton) findViewById(R.id.btEditCategoria);
-        txtScan = (TextView) findViewById(R.id.txtCodigo);
-        layout = (ConstraintLayout)findViewById(R.id.layout_add_product);
-        spinnerUnidad= (Spinner)findViewById(R.id.spinnerUnidad_AddP);
+        EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+        EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+        ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
+        ImageButton btPhot = (ImageButton) findViewById(R.id.btPhoto);
+        Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_add);
+        ImageButton btCategoria = (ImageButton) findViewById(R.id.btEditCategoria);
+        TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
+        Spinner spinnerUnidad= (Spinner)findViewById(R.id.spinnerUnidad_AddP);
         imagePath="";
         addList=false;
         Log.d("MyApp", "ADD PRODUCT");
@@ -103,18 +91,17 @@ public class Add_product extends AppCompatActivity {
         this.setTitle("Añadir Producto");
 
         /*Cargar base de datos de categorias*/
+
+        MySQL mysql = MySQL.getInstance(this);
+        SQLiteDatabase db = mysql.getWritableDatabase();
         mysql = new MySQL(this);
-        db = mysql.getWritableDatabase();
-        arrayCategoria = mysql.loadCategories(db);
-        arrayCategoriaN = new ArrayList<String>();
-        if (arrayCategoria.size() == 0) {
-            arrayCategoriaN.add(0, "Ninguna");
-        } else {
-            for (int i = 0; i < arrayCategoria.size(); i++) {
-                arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
-            }
+        arrayCategoria = mysql.cargarCategorias(db);
+        ArrayList<String> arrayCategoriaN = new ArrayList<String>();
+        for (int i = 0; i < arrayCategoria.size(); i++) {
+            arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
         }
         unidadSelec = 0;
+
         if(myRequestStoragePermission()){
             btPhot.setEnabled(true);
         }
@@ -125,55 +112,55 @@ public class Add_product extends AppCompatActivity {
         spinnerUnidad.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, arrayUnidad));
 
-        spinner_categorias.setAdapter(new ArrayAdapter<String>(this,
+         spinner_categorias.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, arrayCategoriaN));
 
         if (getIntent().getExtras() != null) {
             Bundle b = getIntent().getExtras();
            /* if (b.getSerializable("Producto") != null) {
                 producto = (Producto) b.getSerializable("Producto");
-                this.txtNameProduct.setText(producto.getNombre());
-                this.txtPrecioProducto.setText(producto.getPrecio());
-                this.txtScan.setText(producto.getCodigo());
+                this.txtNameProduct.setText(producto.getName());
+                this.txtPrecioProducto.setText(producto.getPrice());
+                this.txtScan.setText(producto.getCode());
                 txtScan.setVisibility(View.VISIBLE);
             }*/
            if(b.get("Add_lista")!=null){
                addList=true;
-               sp = (SuperMercado) b.get("SuperMercado");
+               superMerc = (SuperMercado) b.get("SuperMercado");
             }
 
             if (b.get("AddProducto") != null) {
-                this.txtNameProduct.setText(b.getString("AddProducto"));
+                txtNameProduct.setText(b.getString("AddProducto"));
                 txtScan.setVisibility(View.VISIBLE);
                 b.remove("AddProducto");
                 producto =  new Producto();
             } else if (b.get("CODIGO") != null) {
-                this.txtScan.setText(b.getString("CODIGO"));
+                txtScan.setText(b.getString("CODIGO"));
                 txtScan.setVisibility(View.VISIBLE);
                 b.remove("CODIGO");
                 producto =  new Producto();
-                producto.setCodigo(b.getString("CODIGO"));
+                producto.setCode(b.getString("CODIGO"));
             } else if (b.getSerializable("Producto_scanner_internet_Anyadir") != null) {
                 Log.d("MyApp", "Existe un producto desde internet");
-
                 producto = (Producto) b.getSerializable("Producto_scanner_internet_Anyadir");
-                this.btPhot.setEnabled(false);
-                this.txtNameProduct.setText(producto.getNombre());
-                this.txtScan.setText(producto.getCodigo());
+                btPhot = (ImageButton) findViewById(R.id.btPhoto);
+                btPhot.setEnabled(false);
+                txtNameProduct.setText(producto.getName());
+                txtScan.setText(producto.getCode());
                 txtScan.setVisibility(View.VISIBLE);
-                Log.d("MyApp", "Ruta imagen '" + producto.getRutaImagen() + "'");
-                if (producto.getRutaImagen().equals("")) {
+                Log.d("MyApp", "Ruta imagen '" + producto.getImagePath() + "'");
+                if (producto.getImagePath().equals("")) {
                     Log.d("MyApp", "Imagen vacia");
                     btPhot.setImageDrawable(getResources().getDrawable(R.drawable.photo_icon));
                     //btPhot.setImageResource(R.drawable.photo_icon);
                 }
                 else {
-                    new CargarImagenInternet().execute(producto.getRutaImagen());
+                    new CargarImagenInternet().execute(producto.getImagePath());
                 }
                 Toast.makeText(this, "Producto encontrado en Internet.", Toast.LENGTH_LONG).show();
 
             }
-            this.txtPrecioProducto.setText("0.0");
+            txtPrecioProducto.setText("0.0");
         }
 
 
@@ -182,6 +169,7 @@ public class Add_product extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View v,
                                        int pos, long id) {
+                Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_add);
                 if(v.getId()==spinner_categorias.getId()) {
                     Log.d("MyApp", "pos categoria " + pos);
                     unidadSelec = pos;
@@ -200,7 +188,7 @@ public class Add_product extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-            if (v.getId() == btCategoria.getId()) {
+                if (v.getId() == R.id.btEditCategoria) {
 
                 /******Ventana de introducir arrayCategoria*******/
 
@@ -220,12 +208,17 @@ public class Add_product extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.d("MyApp", "Aceptar categoria");
+                        MySQL mysql = MySQL.getInstance(getApplicationContext());
+                        SQLiteDatabase db = mysql.getWritableDatabase();
+                        mysql.anyadirCategoria(input.getText().toString(), db);
                         db = mysql.getWritableDatabase();
-                        mysql.addCategoria(input.getText().toString(), db);
-                        db = mysql.getWritableDatabase();
-                        arrayCategoria = mysql.loadCategories(db);
-                        Log.d("MyApp", "categoria cargada");
+                        arrayCategoria = mysql.cargarCategorias(db);
+                        ArrayList<String> arrayCategoriaN = new ArrayList<String>();
+                        for (int i = 0; i < arrayCategoria.size(); i++) {
+                            arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
+                        }
                         arrayCategoriaN.add(input.getText().toString());
+                        Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_add);
                         spinner_categorias.setAdapter(new ArrayAdapter<String>(Add_product.this, android.R.layout.simple_list_item_1, arrayCategoriaN));
                         Log.d("MyApp", "spinner");
                         unidadSelec = arrayCategoriaN.size() - 1;
@@ -274,7 +267,7 @@ public class Add_product extends AppCompatActivity {
                                 Intent intent;
                                 switch(which){
                                     case 0:
-                                        takePintureIntent();
+                                        takePictureIntent();
                                         break;
                                     case 1:
                                         intent = new Intent(Intent.ACTION_PICK,
@@ -298,13 +291,9 @@ public class Add_product extends AppCompatActivity {
 
     }
 
-    /**
-     * Si el la versión del movil es 23+ podrá utilizar el escaner de código de barras
-     */
-    @TargetApi(Build.VERSION_CODES.M)
     private void scannerBarCode() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+     //   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.) {
             IntentIntegrator integrator = new IntentIntegrator(Add_product.this);
             integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
             integrator.setPrompt("Scan");
@@ -312,15 +301,16 @@ public class Add_product extends AppCompatActivity {
             integrator.setBeepEnabled(false);
             integrator.setBarcodeImageEnabled(false);
             integrator.initiateScan();
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(Add_product.this);
+      //  } else {
+    /*        AlertDialog.Builder builder = new AlertDialog.Builder(Add_product.this);
             builder.setTitle("Escaner no disponible");
             builder.setMessage("El escaner no esta disponible para su versión de móvil");
+            ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
             scanBtn.setEnabled(false);
-        }
+        }*/
     }
 
-    private void takePintureIntent(){
+    private void takePictureIntent(){
         try {
 
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -339,40 +329,6 @@ public class Add_product extends AppCompatActivity {
         }
     }
 
-  /*  private void showCamera(){
-        Intent intent;
-        File file = new File(Environment.
-                getExternalStorageDirectory(), MEDIA_DIRECTORY);
-
-        if(!file.exists()){
-            file.mkdirs();
-            Log.d("MyApp", file.exists()+" mkdir ");
-            Log.d("MyApp", file.getPath()+"  ");
-        }
-        if(file.exists()){
-
-            Long timestamp= System.currentTimeMillis()/1000;
-            String imageName = timestamp.toString()+".jpg";
-            imagePath = Environment.getExternalStorageDirectory()
-                    +File.separator+MEDIA_DIRECTORY+
-                    File.separator+imageName;
-            Log.d("MyApp", imagePath+"  ");
-            File newFile = new File(imagePath);
-            intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            Log.d("MyApp", " 2 ");
-
-            Uri photoURI = FileProvider.getUriForFile (Add_product.this,
-                    this.getApplicationContext().getPackageName() +
-                            ".provider", newFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newFile));
-
-            Log.d("MyApp", " 3 ");
-            startActivityForResult(intent, PHOTO_CODE);
-        }
-    }*/
-
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -385,30 +341,37 @@ public class Add_product extends AppCompatActivity {
         imagePath = savedInstanceState.getString("file_path");
     }
 
+
     private boolean myRequestStoragePermission(){
 
-        if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
-            return true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                    && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
+                return true;
+        }
 
-        if((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) ||
-                (shouldShowRequestPermissionRationale(CAMERA))){
-            Snackbar.make(layout,"Los permisos son necesarios para poder usar la aplicacion",Snackbar.
-                    LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) ||
+                    (shouldShowRequestPermissionRationale(CAMERA))){
+                ConstraintLayout layout = (ConstraintLayout)findViewById(R.id.layout_add_product);
+                Snackbar.make(layout,"Los permisos son necesarios para poder usar la aplicacion",Snackbar.
+                        LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener(){
 
-                @TargetApi(Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
-                }
-            });
-        }else{
-            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+                    }
+                });
+            }else{
+                requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+            }
         }
         return false;
     }
 
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.menu_product, menu);
@@ -420,14 +383,14 @@ public class Add_product extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d("MyApp","Aceptar");
                 int idCategoria;
-
+                EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
                 idCategoria = arrayCategoria.get(unidadSelec).getId();
 
                 //guardar la imagen en la memoria del movil y cambiar la direccion de la imagen de producto
                 if(!txtNameProduct.getText().toString().equals("")) {
-                    if(imagePath.equals("") && !producto.getRutaImagen().equals("")){
+                    if(imagePath.equals("") && !producto.getImagePath().equals("")){
                         try {
-                            imagePath = new guardarImagenInternet().execute(producto.getRutaImagen(),txtNameProduct.getText().toString() ).get();
+                            imagePath = new ObtenerRutaImagenDeInternet().execute(producto.getImagePath(),txtNameProduct.getText().toString() ).get();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
@@ -438,17 +401,21 @@ public class Add_product extends AppCompatActivity {
                         //si se hizo una foto
                         if(photo)
                         {
-                            loadImagePath();
+                            imagePath= loadImagePath();
                         }
                     }
-
                     //Si la activity es llamada desde lista de compra, añadiremos el producto a la lista
                     if(addList){
                         anyadirProductoListaCompra(idCategoria);
                     }
                     else {
-                        db = mysql.getWritableDatabase();
-                        mysql.addProducto(txtNameProduct.getText().toString(),
+                        MySQL mysql = MySQL.getInstance(getApplicationContext());
+                        SQLiteDatabase db = mysql.getWritableDatabase();
+                        Spinner spinnerUnidad= (Spinner)findViewById(R.id.spinnerUnidad_AddP);
+                        TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
+                        EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+
+                        mysql.insertProducto(txtNameProduct.getText().toString(),
                                 txtPrecioProducto.getText().toString(),
                                 imagePath, txtScan.getText().toString(),
                                 idCategoria, spinnerUnidad.getSelectedItemPosition(), db);
@@ -479,7 +446,13 @@ public class Add_product extends AppCompatActivity {
         return true;
     }
 
-    private void loadImagePath(){
+    /****************************
+    *****Carga la ruta de la foto
+    * ***********************/
+    private String loadImagePath(){
+        String path="";
+        ImageButton btPhot = (ImageButton) findViewById(R.id.btPhoto);
+        EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
         try {
             Bitmap bitmap = ((BitmapDrawable) btPhot.getDrawable()).getBitmap();
             File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
@@ -487,20 +460,55 @@ public class Add_product extends AppCompatActivity {
             FileOutputStream out = new FileOutputStream(ruta);
             bitmap.compress(Bitmap.CompressFormat.PNG,10,out);
             out.flush();
-            imagePath=ruta.getAbsolutePath();
+            path=ruta.getAbsolutePath();
 
-        }catch (Exception e){}
+        }catch (Exception e){e.printStackTrace();}
+        return path;
     }
 
     public void anyadirProductoListaCompra(int idCategoria){
 
-        db = mysql.getWritableDatabase();
+        Spinner spinnerUnidad= (Spinner)findViewById(R.id.spinnerUnidad_AddP);
+        TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
+        EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+        EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+
+        MySQL mysql = MySQL.getInstance(this);
+        SQLiteDatabase db = mysql.getWritableDatabase();
         producto = new Producto(-1, txtNameProduct.getText().toString(),
                 Double.parseDouble(txtPrecioProducto.getText().toString()),
                 imagePath, txtScan.getText().toString(),
                 idCategoria, spinnerUnidad.getSelectedItemPosition());
 
-        mysql.add_Producto_And_Add_Producto_To_Lista_Supermercado(db,sp,producto);
+        mysql.anyadir_Producto_Y_Anyadir_A_Lista_SuperMercado(db, superMerc,producto);
+
+    }
+
+    /*Si queremos guardar el producto debemos almacenar la imagen, que es una URL y pasarla a un
+    * mapabit */
+    private class ObtenerRutaImagenDeInternet extends  AsyncTask<String, Void, String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+            Bitmap imagen =null;
+            URL imageUrl = null;
+            File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
+            File ruta=  new File(dirImg, params[1]+".png");
+            try {
+                imageUrl = new URL(params[0]);
+                HttpURLConnection conex = (HttpURLConnection) imageUrl.openConnection();
+                conex.connect();
+                imagen = BitmapFactory.decodeStream(conex.getInputStream());
+                FileOutputStream fos = new FileOutputStream(ruta);
+                imagen.compress(Bitmap.CompressFormat.PNG,10,fos);
+                fos.flush();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return ruta.getAbsolutePath();
+        }
 
     }
 
@@ -512,6 +520,7 @@ public class Add_product extends AppCompatActivity {
                     grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                     grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this, "Permisos aceptados", Toast.LENGTH_SHORT).show();
+                ImageButton btPhot = (ImageButton) findViewById(R.id.btPhoto);
                 btPhot.setEnabled(true);
             }
         }else {
@@ -525,12 +534,6 @@ public class Add_product extends AppCompatActivity {
                     intent.setAction(Settings.ACTION_APPLICATION_SETTINGS);
                     //abrira la configuracion de esta aplicacion
                     Uri uri = Uri.fromParts("package", getPackageName(), null);
-                   /* Uri photoURI = FileProvider.getUriForFile(Add_product.this,
-                            BuildConfig.APPLICATION_ID + ".provider",
-                           null);*/
-                   /* Uri contentUri = FileProvider.getUriForFile(getApplicationContext(),
-                            "${applicationId}.provider", null);*/
-
                     intent.setData(uri);
                     startActivity(intent);
                 }
@@ -563,6 +566,7 @@ public class Add_product extends AppCompatActivity {
                     Toast.makeText(this, "You cancelled the scanning", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d("MyApp", "SCANNER");
+                    TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
                     txtScan.setText(result.getContents());
                     txtScan.setVisibility(View.VISIBLE);
                 }
@@ -572,6 +576,7 @@ public class Add_product extends AppCompatActivity {
                         extras = data.getExtras();
                         if(extras!=null){
                             Bitmap phot = extras.getParcelable("data");
+                            ImageButton btPhot = (ImageButton) findViewById(R.id.btPhoto);
                             btPhot.setImageBitmap(phot);
                             photo=true;
                         }
@@ -589,66 +594,11 @@ public class Add_product extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
         finish();
-     /*   if (getIntent().getExtras() != null) {
-            Bundle b = getIntent().getExtras();
-            if(b.get("AddProducto")!=null) {
-                Intent i = new Intent(this, activity_lista_productos.class);
-                startActivity(i);
-            }
-        }
-        else {
-            Intent i = new Intent(this, Inicio.class);
-            startActivity(i);
-        }
-        finish();*/
-   /*     Intent i = new Intent(this, activity_lista_productos.class);
-        startActivity(i);
-        finish();*/
-
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth,
-                                            int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(InputStream res, Rect rc) {
-
-        int reqWidth = 250;
-        int reqHeight = 250;
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(res, rc, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(res, rc, options);
-    }
-
+    /*En el caso que el producto se haya cargado mediante el escaner de codigo de barras,
+    * se cargará la imagen del producto que es una URL*/
    private class CargarImagenInternet extends AsyncTask<String, Void, Bitmap> {
 
         @Override
@@ -656,10 +606,9 @@ public class Add_product extends AppCompatActivity {
             Bitmap imagen=null;
             InputStream input = null;
             try{
-                URL imageUrl = new URL(producto.getRutaImagen());
+                URL imageUrl = new URL(producto.getImagePath());
                 HttpURLConnection conex= (HttpURLConnection)imageUrl.openConnection();
                 conex.connect();
-                input = conex.getInputStream();
                 imagen = BitmapFactory.decodeStream(conex.getInputStream());
 
             }catch (Exception e){
@@ -668,35 +617,11 @@ public class Add_product extends AppCompatActivity {
             return imagen;
         }
         protected  void onPostExecute(Bitmap imagen){
-           // imagen = Bitmap.createScaledBitmap(imagen, btPhot.getWidth(),btPhot.getHeight(), false);
-            Add_product.this.btPhot.setImageBitmap(imagen);
+            ImageButton btPhot = (ImageButton) findViewById(R.id.btPhoto);
+            btPhot.setImageBitmap(imagen);
         }
     }
 
-    private class guardarImagenInternet extends  AsyncTask<String, Void, String>{
 
-        @Override
-        protected String doInBackground(String... params) {
-            Bitmap imagen =null;
-            URL imageUrl = null;
-            File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
-            File ruta=  new File(dirImg, params[1]+".png");
-            try {
-                imageUrl = new URL(params[0]);
-                HttpURLConnection conex = (HttpURLConnection) imageUrl.openConnection();
-                conex.connect();
-                imagen = BitmapFactory.decodeStream(conex.getInputStream());
-                FileOutputStream fos = new FileOutputStream(ruta);
-                imagen.compress(Bitmap.CompressFormat.PNG,10,fos);
-                fos.flush();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return ruta.getAbsolutePath();
-        }
-
-    }
 
 }

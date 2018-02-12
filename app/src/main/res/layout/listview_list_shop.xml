@@ -20,9 +20,7 @@
         android:id="@+id/lista_productos_comprar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/layout_bottom_price_numElem">
-
-    </ListView>
+        android:layout_above="@id/layout_bottom_price_numElem" />
 
     <LinearLayout
         android:id="@+id/layout_bottom_price_numElem"
@@ -44,13 +42,14 @@
                 android:id="@+id/etPrecioTotal"
                 android:layout_width="95dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:ems="10"
                 android:text="@string/etPrecioTotal"
-                android:textAlignment="textStart"
+                android:layout_gravity="start"
                 android:textColor="@android:color/background_light"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginStart="10dp" />
 
             <TextView
                 android:id="@+id/txtPrecioTotal"
@@ -58,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:maxLength="10"
-                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:textColor="@android:color/background_light"
                 android:textSize="14sp" />
 
@@ -75,21 +74,23 @@
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/etNumPro"
-                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:textColor="@android:color/background_light"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginStart="10dp" />
 
             <TextView
                 android:id="@+id/txtNumProd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:maxLength="10"
-                android:textAlignment="viewStart"
+                android:layout_gravity="start"
                 android:textColor="@android:color/background_light"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginStart="10dp" />
         </LinearLayout>
 
     </LinearLayout>

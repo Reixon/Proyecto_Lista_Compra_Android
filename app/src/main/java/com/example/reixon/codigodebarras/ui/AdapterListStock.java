@@ -1,7 +1,6 @@
 package com.example.reixon.codigodebarras.ui;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -15,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.reixon.codigodebarras.db.MySQL;
 import com.example.reixon.codigodebarras.Model.Producto;
 import com.example.reixon.codigodebarras.R;
 
@@ -33,12 +31,9 @@ import java.util.List;
 
  class AdapterListStock extends BaseAdapter {
 
-    private ArrayList<Producto> searchList;
     private ViewHolder holder = null;
     private List<Producto> proList;
-    private Lista_productos context;
-    private MySQL mysql;
-    private SQLiteDatabase db;
+    private Lista_productos lista_productos;
     private boolean [] itemChecks;
     private int numChecks;
     private boolean checkAll,checkState;
@@ -46,9 +41,7 @@ import java.util.List;
     public AdapterListStock(Context context, int textViewResourceId,
                             ArrayList<Producto> listaProductosDada) {
         proList = listaProductosDada;
-        searchList = listaProductosDada;
-        this.context = (Lista_productos) context;
-        mysql = new MySQL(context);
+        this.lista_productos = (Lista_productos) context;
         itemChecks = new boolean[listaProductosDada.size()];
         numChecks=0;
         checkState=false;
@@ -57,12 +50,8 @@ import java.util.List;
 
     public void setList(ArrayList<Producto> proTotal){
         proList = proTotal;
-        searchList = (ArrayList)proTotal;
         itemChecks = new boolean[proTotal.size()];
         notifyDataSetChanged();
-    }
-    public ArrayList<Producto>getSearchList(){
-        return searchList;
     }
 
     public boolean[] getItemCheck(){
@@ -76,15 +65,9 @@ import java.util.List;
     }
 
 
-    public void anyadirProducto(String nombre){
-        db = mysql.getWritableDatabase();
-        mysql.addProducto(nombre, "0","","",1,0,db);
-        db = mysql.getWritableDatabase();
-        context.setProductosTotales(mysql.loadFullProduct(db));
-        proList = context.getProductosTotales();
-        searchList = context.getProductosTotales();
+    public void updateList(ArrayList<Producto> productos){
+        proList = productos;
         itemChecks = new boolean[proList.size()];
-        Toast.makeText(context, nombre +" creado", Toast.LENGTH_SHORT).show();
         this.notifyDataSetChanged();
     }
 
@@ -101,12 +84,12 @@ import java.util.List;
         if(checkAll){
             checkAll=false;
             numChecks=0;
-            context.setVisibleMenusActive(false);
+            lista_productos.setVisibleMenusActive(false);
         }
         else{
             checkAll=true;
             numChecks=proList.size();
-            context.setVisibleMenusActive(true);
+            lista_productos.setVisibleMenusActive(true);
 
         }
         for(int i=0; i<itemChecks.length;i++){
@@ -143,13 +126,13 @@ import java.util.List;
     public View getView(final int position, View convertView, ViewGroup parent) {
         try {
             if (convertView == null) {
-                LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater vi = (LayoutInflater) lista_productos.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                 convertView = vi.inflate(R.layout.stock_product_adapter, null);
                 holder = new ViewHolder();
                 holder.imagen = (ImageView) convertView
                         .findViewById(R.id.imagenListProductos);
-                holder.name = (TextView) convertView.findViewById(R.id.nombre);
+                holder.name = (TextView) convertView.findViewById(R.id.name);
                 holder.precio = (TextView) convertView.findViewById(R.id.txt_precio_prod);
                 holder.check = (CheckBox) convertView.findViewById(R.id.etcheckBox);
                 holder.cantidad =(TextView)convertView.findViewById(R.id.txtCantidad);
@@ -161,19 +144,19 @@ import java.util.List;
                 holder = (ViewHolder) convertView.getTag();
             }
             Producto p = this.proList.get(position);
-            holder.name.setText(p.getNombre() + " ");
-            holder.precio.setText(p.getPrecio() + " ");
+            holder.name.setText(p.getName() + " ");
+            holder.precio.setText(p.getPrice() + " ");
             holder.check.setChecked(itemChecks[position]);
             holder.check.setTag(position);
 
 
 
-            if(p.getRutaImagen().equals("")) {
-                holder.imagen.setImageDrawable(context.getResources().getDrawable(R.drawable.photo_icon));
+            if(p.getImagePath().equals("")) {
+                holder.imagen.setImageDrawable(lista_productos.getResources().getDrawable(R.drawable.photo_icon));
             }
             else{
                 //creamos un hilo para que cargue las imagenes
-                new loadImage(holder.imagen).execute(p.getRutaImagen());
+                new loadImage(holder.imagen).execute(p.getImagePath());
             }
             holder.check.setOnClickListener(new View.OnClickListener() {
 
@@ -184,11 +167,11 @@ import java.util.List;
                     if(cb.isChecked()) {
                         itemChecks[Integer.valueOf(position)]=cb.isChecked();
                         numChecks++;
-                        Toast.makeText(context, proList.get(position).getNombre(),Toast.LENGTH_SHORT);
+                        Toast.makeText(lista_productos, proList.get(position).getName(),Toast.LENGTH_SHORT);
 
                         if(numChecks>0) {
                             checkState=false;
-                            context.setVisibleMenusActive(true);
+                            lista_productos.setVisibleMenusActive(true);
                         }
                     }
                     else {
@@ -196,13 +179,13 @@ import java.util.List;
                         if(numChecks==proList.size()){
                             checkState=false;
                             checkAll=false;
-                            context.invalidateOptionsMenu();
+                            lista_productos.invalidateOptionsMenu();
                         }
                         numChecks--;
 
                         if(numChecks==0){
                             checkAll=false;
-                            context.setVisibleMenusActive(false);
+                            lista_productos.setVisibleMenusActive(false);
 
                         }
                     }
@@ -221,16 +204,14 @@ import java.util.List;
 
     private class loadImage extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageRef;
-        //private ProgressDialog dialog;
         private loadImage(ImageView imageRef) {
             this.imageRef = new WeakReference<ImageView>(imageRef);
-    //        dialog = new ProgressDialog(activity);
+
         }
-    /*    @Override
+        @Override
         protected void onPreExecute(){
-            dialog.setMessage("Cargando. Espere por favor.");
-            dialog.show();
-        }*/
+
+        }
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -248,9 +229,7 @@ import java.util.List;
         }
 
         protected void onPostExecute(Bitmap image){
-         /*   if (dialog.isShowing()) {
-                dialog.dismiss();
-            }*/
+
             ImageView imageView = imageRef.get();
             imageView.setImageBitmap(image);
         }

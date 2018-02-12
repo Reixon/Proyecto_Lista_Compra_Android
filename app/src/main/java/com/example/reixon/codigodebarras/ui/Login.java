@@ -6,26 +6,18 @@ import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,33 +44,24 @@ import java.util.List;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AccountAuthenticatorActivity
-        implements LoaderCallbacks<Cursor> {
+public class Login extends AccountAuthenticatorActivity /*extends LoaderCallbacks<Cursor>*/{
 
     /**
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    public static final String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
     public static final String ARG_AUTH_TYPE = "AUTH_TYPE_CODIGO_BARRAS";
-    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
-    public static final String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
     public static final String PARAM_USER_PASS = "USER_PASS";
     public static final String PARAM_USER_NAME ="USER_NAME";
 
     private AccountManager mAccountManager;
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    private UserLoginTask mAuthTask;
+
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
@@ -90,9 +73,9 @@ public class LoginActivity extends AccountAuthenticatorActivity
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+        //populateAutoComplete();
         mAccountManager = AccountManager.get(this);
-
+        mAuthTask=null;
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -117,15 +100,15 @@ public class LoginActivity extends AccountAuthenticatorActivity
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    private void populateAutoComplete() {
+    /*private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
 
         getLoaderManager().initLoader(0, null, this);
-    }
+    }*/
 
-    private boolean mayRequestContacts() {
+    /*private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -145,7 +128,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
             requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
         }
         return false;
-    }
+    }*/
 
     /**
      * Callback received when a permissions request has been completed.
@@ -155,17 +138,11 @@ public class LoginActivity extends AccountAuthenticatorActivity
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
+                //populateAutoComplete();
             }
         }
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
         if (mAuthTask != null) {
             return;
@@ -200,7 +177,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
             focusView = mEmailView;
             cancel = true;
         }
-        else if(mysql.searchUserEmail(email,db)){
+        else if(mysql.buscar_Email_Cuenta_Usuario(email,db)){
             mEmailView.setError(getString(R.string.error_this_email_is_add));
             focusView = mEmailView;
             cancel = true;
@@ -232,14 +209,11 @@ public class LoginActivity extends AccountAuthenticatorActivity
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * animación de carga de login
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -267,7 +241,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
         }
     }
 
-    @Override
+  /*  @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
                 // Retrieve data rows for the device result's 'profile' contact.
@@ -304,14 +278,14 @@ public class LoginActivity extends AccountAuthenticatorActivity
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
+                new ArrayAdapter<>(Login.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
-    }
+    }*/
 
 
-    private interface ProfileQuery {
+  /*  private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
                 ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
@@ -319,7 +293,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
-    }
+    }*/
 
 
 
@@ -433,10 +407,10 @@ public class LoginActivity extends AccountAuthenticatorActivity
                 finishLog(res);
 
             } else if (success.contentEquals("false")){
-                Toast.makeText(LoginActivity.this,getString(R.string.error_this_account_not_exist),Toast.LENGTH_SHORT).show();;
+                Toast.makeText(Login.this,getString(R.string.error_this_account_not_exist),Toast.LENGTH_SHORT).show();;
             }
             else if(success.contentEquals("exception")){
-                Toast.makeText(LoginActivity.this,"ocurrio un error",Toast.LENGTH_SHORT).show();
+                Toast.makeText(Login.this,"ocurrio un error",Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -448,7 +422,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
     }
 
 
-    public void finishLog(Intent i){
+    private void finishLog(Intent i){
         String accountName = i.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String pass = i.getStringExtra(PARAM_USER_PASS);
         String name = i.getStringExtra(PARAM_USER_NAME);
@@ -459,7 +433,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
     //    if(getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)){
             String authToken = i.getStringExtra(AccountManager.KEY_AUTHTOKEN);
-            String authTokenType = LoginActivity.ARG_AUTH_TYPE;
+            String authTokenType = Login.ARG_AUTH_TYPE;
             mAccountManager.addAccountExplicitly(account,pass,null);
             mAccountManager.setAuthToken(account,authTokenType,authToken);
     /*    }
@@ -469,7 +443,7 @@ public class LoginActivity extends AccountAuthenticatorActivity
 
         MySQL mysql = new MySQL(this);
         SQLiteDatabase db = mysql.getWritableDatabase();
-        mysql.insertUser(name, accountName, authToken,db);
+        mysql.insertarUsuario(name, accountName, authToken,db);
 
 
         setAccountAuthenticatorResult(i.getExtras());

@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.example.reixon.codigodebarras.db.MySQL;
 
@@ -23,14 +24,9 @@ public class ListShopsProvider extends ContentProvider {
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        /*
-        * URI para todas las listas
-        * */
+
         sUriMatcher.addURI(ListShopContract.AUTHORITY,"listshops",LISTSHOPS_LIST);
 
-        /*
-        * URI para una lista
-        * */
         sUriMatcher.addURI(ListShopContract.AUTHORITY,"listshops/#",LISTSHOP_ID);
 
         sUriMatcher.addURI(ListShopContract.AUTHORITY,"products",PRODUCTS_LIST);
@@ -52,6 +48,27 @@ public class ListShopsProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
+        SQLiteDatabase db = mySQL.getReadableDatabase();
+        switch (sUriMatcher.match(uri)){
+            case LISTSHOPS_LIST:
+                if (sortOrder == null || TextUtils.isEmpty(sortOrder))
+                    sortOrder = ListShopContract.ListShopsColumns.DEFAULT_SORT_ORDER;
+                break;
+            case LISTSHOP_ID:
+                if (selection == null)
+                    selection = "";
+                selection = selection + "_ID = " + uri.getLastPathSegment();
+                break;
+            case PRODUCTS_LIST:
+
+                break;
+            case PRODUCTS_ID:
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported URI: " + uri);
+        }
+
         return null;
     }
 
@@ -63,10 +80,6 @@ public class ListShopsProvider extends ContentProvider {
                 return ListShopContract.URI_TYPE_LISTSHOP_DIR;
             case LISTSHOP_ID:
                 return ListShopContract.URI_TYPE_LISTSHOP_ITEM;
-            case PRODUCTS_LIST:
-                return ListShopContract.URI_TYPE_PRODUCTS_DIR;
-            case PRODUCTS_ID:
-                return ListShopContract.URI_TYPE_PRODUCTS_ITEM;
             default:
                 return null;
         }

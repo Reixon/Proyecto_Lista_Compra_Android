@@ -8,51 +8,39 @@ import java.io.Serializable;
 
 public class Producto implements Serializable {
 
-    private int id, categoria=0, cantidad, unidad;
-    private String nombre,  rutaImagen, codigo;
-    private double precio;
-
+    private int id, category =0, quantity, unity;
+    private String name, imagePath, code;
+    private double price;
     public Producto() {
-        nombre="";
-        rutaImagen="";
-        codigo="";
-        precio=0.0;
+        name ="";
+        imagePath ="";
+        code ="";
+        price =0.0;
     }
 
-    public Producto(String nombre){
-        this.nombre = nombre;
-        this.precio=0.0;
-        rutaImagen="";
-        codigo="";
-    }
-    public Producto (String nombre, String codigo, String rutaImagen){
-        this.nombre = nombre;
-        this.codigo = codigo;
-        this.rutaImagen = rutaImagen;
-        this.precio=0.0;
-
+    public Producto(String name){
+        this.name = name;
+        this.price =0.0;
+        imagePath ="";
+        code ="";
     }
 
-    public Producto(int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int unidad) {
+    public Producto (String name, String code, String imagePath){
+        this.name = name;
+        this.code = code;
+        this.imagePath = imagePath;
+        this.price =0.0;
+    }
+
+    public Producto(int id, String name, double price, String imagePath, String code, int category, int unity) {
         this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.rutaImagen = rutaImagen;
-        this.codigo = codigo;
-        this.categoria= categoria;
-        this.unidad = unidad;
+        this.name = name;
+        this.price = price;
+        this.imagePath = imagePath;
+        this.code = code;
+        this.category = category;
+        this.unity = unity;
 
-    }
-
-    public Producto(int id, String nombre, double precio, String rutaImagen, String codigo, int categoria, int cantidad, int unidad) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.rutaImagen = rutaImagen;
-        this.codigo = codigo;
-        this.categoria= categoria;
-        this.cantidad = cantidad;
-        this.unidad =unidad;
     }
 
     public int getId() {
@@ -63,67 +51,67 @@ public class Producto implements Serializable {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public double getPrecio() {
-        return precio;
+    public double getPrice() {
+        return price;
     }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public String getRutaImagen() {
-        return rutaImagen;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setRutaImagen(String rutaImagen) {
-        this.rutaImagen = rutaImagen;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getCode() {
+        return code;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public int getCategoria() {return categoria;}
+    public int getCategory() {return category;}
 
-    public void setCategoria(int categoria) {this.categoria = categoria;}
+    public void setCategory(int category) {this.category = category;}
 
-    public int getCantidad() {
-        return cantidad;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public int getUnidad() {
-        return unidad;
+    public int getUnity() {
+        return unity;
     }
 
-    public void setUnidad(int unidad) {
-        this.unidad = unidad;
+    public void setUnity(int unity) {
+        this.unity = unity;
     }
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     @Override
     public String toString() {
         return "Producto{" +
                 "id=" + id +
-                ", categoria=" + categoria +
-                ", nombre='" + nombre + '\'' +
-                ", precio='" + precio + '\'' +
-                ", rutaImagen='" + rutaImagen + '\'' +
-                ", codigo='" + codigo + '\'' +
+                ", category=" + category +
+                ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", imagePath='" + imagePath + '\'' +
+                ", code='" + code + '\'' +
                 '}';
     }
 }

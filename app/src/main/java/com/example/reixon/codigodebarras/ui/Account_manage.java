@@ -151,7 +151,7 @@ public class Account_manage extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 if(mArrayUserAccounts.size()>1) {
                                     db = mysql.getWritableDatabase();
-                                    mysql.deleteUser(mArrayUserAccounts.get(position).getId_user(),db);
+                                    mysql.eliminarUsuario(mArrayUserAccounts.get(position).getId_user(),db);
                                     mArrayUserAccounts.remove(position);
                                     AccountManager mAccountManager = AccountManager.get(Account_manage.this);
                                     Account[] account = mAccountManager.getAccountsByType(AccountAuthenticator.ACCOUNT_TYPE);

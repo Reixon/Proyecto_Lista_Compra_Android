@@ -82,7 +82,7 @@ public class Admin_Category extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         db = mysql.getWritableDatabase();
                         Category category = new Category(edit.getText().toString());
-                        mysql.addCategoria(edit.getText().toString(),db);
+                        mysql.anyadirCategoria(edit.getText().toString(),db);
                         arrayCategories.add(category);
                         adapterListCategories.setmArrayCategories(arrayCategories);
                         adapterListCategories.notifyDataSetChanged();
@@ -198,7 +198,7 @@ public class Admin_Category extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 db = mysql.getWritableDatabase();
-                                mysql.deleteCategory(mArrayCategories.get(position).getId(), db);
+                                mysql.eliminarCategoria(mArrayCategories.get(position).getId(), db);
                                 mArrayCategories.remove(position);
                                 notifyDataSetChanged();
                                 setResult(RESULT_OK);

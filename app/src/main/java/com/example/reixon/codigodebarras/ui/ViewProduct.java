@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,22 +55,25 @@ import static com.example.reixon.codigodebarras.R.id.btEditCategoria;
 
 public class ViewProduct extends AppCompatActivity {
 
-    private static String APP_DIRECTORY ="Imagenes_MyShop/";
     private final int SELECT_PICTURE =300;
     private final int MY_PERMISSIONS=100;
     private final int PHOTO_CODE=101;
-    private static final int CROP_PICTURE=102;
 
-    private ArrayList<String> arrayCategoriaN, arrayNombreSupers;
     private ArrayList<Category> arrayCategoria;
     private ArrayList<SuperMercado> arraySuper;
     private int unidadSelec;
-    private Producto p;
-    private SuperMercado superMerc;
+    private Producto producto;
     private String imagePath;
-    private SQLiteDatabase db;
-    private MySQL mysql;
     private boolean photo, listBuy;
+
+    private ImageButton scanBtn, btPhot, btCategoria;
+    private Spinner spinner_categorias,spinnerListaCompra,spinnerUnidad;
+    private TextView txtPrecioTotal,etPrecioTotal;
+    private Button anyadirListaCompra;
+    private EditText txtCant, txtPrecioProducto, txtNameProduct;
+    private LinearLayout layout_cant;
+    private RelativeLayout layout;
+
 
 
     @Override
@@ -79,20 +81,22 @@ public class ViewProduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_product);
 
-        EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
-        EditText txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
-        ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
-        ImageButton btPhot = (ImageButton) findViewById(R.id.imageProd);
-        Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
-        ImageButton btCategoria = (ImageButton) findViewById(btEditCategoria);
+        txtNameProduct = (EditText) findViewById(R.id.txtNombre);
+        txtPrecioProducto = (EditText) findViewById(R.id.txtPrecio);
+        scanBtn = (ImageButton) findViewById(R.id.btBarCode);
+        btPhot = (ImageButton) findViewById(R.id.imageProd);
+        spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
+        btCategoria = (ImageButton) findViewById(btEditCategoria);
         TextView txtScan = (TextView) findViewById(R.id.txtCodigo);
-        Button anyadirListaCompra = (Button) findViewById(R.id.bt_anyadir_listaCompra_proView);
-        Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
-        Spinner spinnerUnidad = (Spinner)findViewById(R.id.spinner_unidad);
-        EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
-        TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
-        TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
-        LinearLayout layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
+        anyadirListaCompra = (Button) findViewById(R.id.bt_anyadir_listaCompra_proView);
+        spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
+        spinnerUnidad = (Spinner)findViewById(R.id.spinner_unidad);
+        txtCant =(EditText)findViewById(R.id.txtCantidad_View);
+        txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
+        etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
+        layout_cant =(LinearLayout)findViewById(R.id.layout_cantidad);
+        layout = (RelativeLayout)findViewById(R.id.layout_view_product);
+
         listBuy=false;
 
         txtPrecioTotal.setVisibility(View.GONE);
@@ -123,13 +127,12 @@ public class ViewProduct extends AppCompatActivity {
         String [] arrayUnidad = {"unidad","lata","botella","paquete","caja","bolsa","mg","gr","kg",
         "ml","cl","litro"};
 
-        mysql = new MySQL(this);
-        db = mysql.getWritableDatabase();
-        arrayCategoria = mysql.loadCategories(db);
 
-    /*    db = mysql.getWritableDatabase();
-        arraySuper = mysql.cargarSuperMercadosBD(db);*/
-        arrayCategoriaN = new ArrayList<String>();
+        MySQL mysql = MySQL.getInstance(getApplicationContext());
+        SQLiteDatabase db = mysql.getWritableDatabase();
+        arrayCategoria = mysql.cargarCategorias(db);
+
+        ArrayList<String> arrayCategoriaN = new ArrayList<String>();
 
         for (int i = 0; i < arrayCategoria.size(); i++) {
             arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
@@ -142,7 +145,7 @@ public class ViewProduct extends AppCompatActivity {
             Bundle b = getIntent().getExtras();
             if(b.getSerializable("Lista Supers")!=null){
                 arraySuper = (ArrayList<SuperMercado>) b.getSerializable("Lista Supers");
-                arrayNombreSupers = new ArrayList<String>();
+                ArrayList<String>  arrayNombreSupers = new ArrayList<String>();
                 for (int i = 0; i < arraySuper.size(); i++) {
                     arrayNombreSupers.add(arraySuper.get(i).getNombre());
                 }
@@ -152,31 +155,36 @@ public class ViewProduct extends AppCompatActivity {
             }
             if (b.getSerializable("Producto") != null) {
                 Log.d("MyApp", "Existe un producto desde lista");
-                p = (Producto) b.getSerializable("Producto");
-                txtNameProduct.setText(p.getNombre());
-                txtPrecioProducto.setText(p.getPrecio()+"");
-                txtScan.setText(p.getCodigo());
-                spinnerUnidad.setSelection(p.getUnidad());
-                if(b.getSerializable("SuperMercado")!=null){
-                    superMerc =(SuperMercado)b.getSerializable("SuperMercado");
+                producto = (Producto) b.getSerializable("Producto");
+                txtNameProduct.setText(producto.getName());
+                txtPrecioProducto.setText(producto.getPrice()+"");
+                txtScan.setText(producto.getCode());
+                spinnerUnidad.setSelection(producto.getUnity());
+                txtScan.setVisibility(View.VISIBLE);
+                b.remove("Producto");
+                if(b.getBoolean("LISTA_COMPRA")){
                     layout_cant.setVisibility(View.VISIBLE);
-                    Log.d("MyApp",p.getCantidad()+"");
-                    double precioT = p.getCantidad()*p.getPrecio();
-                    txtCant.setText(p.getCantidad()+"");
-
-                    if(p.getPrecio()>0){
+                    double precioT = producto.getQuantity()* producto.getPrice();
+                    txtCant.setText(producto.getQuantity()+"");
+                    if(producto.getPrice()>0){
                         txtPrecioTotal.setVisibility(View.VISIBLE);
                         etPrecioTotal.setVisibility(View.VISIBLE);
                         txtPrecioTotal.setText(Double.toString(precioT));
                     }
-
+                    spinnerListaCompra.setVisibility(View.GONE);
+                    anyadirListaCompra.setVisibility(View.GONE);
+                    listBuy=true;
                 }
-                if(p.getRutaImagen().equals("")){
+                else{
+                    layout_cant.setVisibility(View.GONE);
+                }
+
+                if(producto.getImagePath().equals("")){
                     btPhot.setImageDrawable(getResources().getDrawable(R.drawable.photo_icon));
                 }
                 else {
                     try {
-                        Uri imageUri = Uri.parse(p.getRutaImagen());
+                        Uri imageUri = Uri.parse(producto.getImagePath());
                         File file = new File(imageUri.getPath());
                         InputStream ims = new FileInputStream(file);
 
@@ -187,32 +195,22 @@ public class ViewProduct extends AppCompatActivity {
                     }
                 }
                 for (int i = 0; i < arrayCategoria.size(); i++) {
-                    if (arrayCategoria.get(i).getId() == p.getCategoria()) {
+                    if (arrayCategoria.get(i).getId() == producto.getCategory()) {
                        unidadSelec=i;
                     }
                 }
-                txtScan.setVisibility(View.VISIBLE);
-                b.remove("Producto");
-                if(b.getBoolean("LISTA_COMPRA")){
-                    layout_cant.setVisibility(View.VISIBLE);
-                    spinnerListaCompra.setVisibility(View.GONE);
-                    anyadirListaCompra.setVisibility(View.GONE);
-                    listBuy=true;
-                }
-                else{
-                    layout_cant.setVisibility(View.GONE);
-                }
+
 
             } else if (b.getSerializable("Producto_scanner") != null) {
                 Log.d("MyApp", "Existe un producto desde scanner");
 
-                p = (Producto) b.getSerializable("Producto_scanner");
+                producto = (Producto) b.getSerializable("Producto_scanner");
 
-                txtNameProduct.setText(p.getNombre());
-                txtPrecioProducto.setText(p.getPrecio()+"");
-                txtScan.setText(p.getCodigo());
-                Log.d("MyApp", "Ruta imagen '"+p.getRutaImagen()+"'");
-                if(p.getRutaImagen().equals("")){
+                txtNameProduct.setText(producto.getName());
+                txtPrecioProducto.setText(producto.getPrice()+"");
+                txtScan.setText(producto.getCode());
+                Log.d("MyApp", "Ruta imagen '"+ producto.getImagePath()+"'");
+                if(producto.getImagePath().equals("")){
                     Log.d("MyApp", "Imagen vacia");
 
                     btPhot.setImageDrawable(getResources().getDrawable(R.drawable.photo_icon));
@@ -220,7 +218,7 @@ public class ViewProduct extends AppCompatActivity {
                 }
                 else {
                     try {
-                        Uri imageUri = Uri.parse(p.getRutaImagen());
+                        Uri imageUri = Uri.parse(producto.getImagePath());
                         File file = new File(imageUri.getPath());
                         InputStream ims = new FileInputStream(file);
 
@@ -232,7 +230,7 @@ public class ViewProduct extends AppCompatActivity {
                 }
 
                 for (int i = 0; i < arrayCategoria.size(); i++) {
-                    if (arrayCategoria.get(i).getId() == p.getCategoria()) {
+                    if (arrayCategoria.get(i).getId() == producto.getCategory()) {
                         unidadSelec=i;
                     }
                 }
@@ -241,27 +239,27 @@ public class ViewProduct extends AppCompatActivity {
             }
             spinner_categorias.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayCategoriaN));
             spinner_categorias.setSelection(unidadSelec);
-            this.setTitle(p.getNombre());
+            this.setTitle(producto.getName());
         }
 
         anyadirListaCompra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
                 int num=  arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos().size();
                 ArrayList<Producto> productos = (ArrayList<Producto>)arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getProductos();
                 boolean b=false;
                 if(num>0) {
                     for (int i = 0; i < num; i++) {
-                        if (productos.get(i).getId() == p.getId()) {
+                        if (productos.get(i).getId() == producto.getId()) {
                             b=true;
                         }
                     }
                 }
                 if(!b){
-                    db = mysql.getWritableDatabase();
-                    mysql.add_Producto_A_Lista_SuperMercado(db,
-                            arraySuper.get(spinnerListaCompra.getSelectedItemPosition()), p);
+                    MySQL mysql = MySQL.getInstance(getApplicationContext());
+                    SQLiteDatabase db = mysql.getWritableDatabase();
+                    mysql.anyadir_Producto_A_Lista_SuperMercado(db,
+                            arraySuper.get(spinnerListaCompra.getSelectedItemPosition()), producto);
                     arraySuper = mysql.cargarSuperMercadosBD(db);
                     Toast.makeText(ViewProduct.this, "Añadido", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
@@ -273,7 +271,7 @@ public class ViewProduct extends AppCompatActivity {
             }
         });
 
-        spinnerListaCompra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+   /*     spinnerListaCompra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
                 Spinner spinnerListaCompra =(Spinner)findViewById(R.id.spinner_listSuper_proView);
@@ -282,7 +280,7 @@ public class ViewProduct extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
-        });
+        });*/
 
         btPhot.setOnClickListener(new View.OnClickListener() {
 
@@ -340,7 +338,6 @@ public class ViewProduct extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                ImageButton btCategoria = (ImageButton) findViewById(btEditCategoria);
                 if (v.getId() == btCategoria.getId()) {
 
                     /******Ventana de introducir arrayCategoria*******/
@@ -359,11 +356,15 @@ public class ViewProduct extends AppCompatActivity {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Spinner spinner_categorias = (Spinner) findViewById(R.id.spinner_categoria_view);
+                            MySQL mysql = MySQL.getInstance(getApplicationContext());
+                            SQLiteDatabase db = mysql.getWritableDatabase();
+                            mysql.anyadirCategoria(input.getText().toString(), db);
                             db = mysql.getWritableDatabase();
-                            mysql.addCategoria(input.getText().toString(), db);
-                            db = mysql.getWritableDatabase();
-                            arrayCategoria = mysql.loadCategories(db);
+                            arrayCategoria = mysql.cargarCategorias(db);
+                            ArrayList<String> arrayCategoriaN = new ArrayList<String>();
+                            for (int i = 0; i < arrayCategoria.size(); i++) {
+                                arrayCategoriaN.add(arrayCategoria.get(i).getNombre());
+                            }
                             arrayCategoriaN.add(input.getText().toString());
                             spinner_categorias.setAdapter(new ArrayAdapter<String>(ViewProduct.this, android.R.layout.simple_list_item_1, arrayCategoriaN));
                             unidadSelec = arrayCategoriaN.size() - 1;
@@ -411,14 +412,11 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 double total;
-                TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
-                TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
-                EditText txtPrecio = (EditText)findViewById(R.id.txtPrecio);
-                EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
-                if(!s.toString().equals("") && !txtPrecio.getText().toString().equals(""))
+
+                if(!s.toString().equals("") && !txtPrecioProducto.getText().toString().equals(""))
                 {
                     int cant = Integer.parseInt(s.toString());
-                    double pr = Double.parseDouble(txtPrecio.getText().toString());
+                    double pr = Double.parseDouble(txtPrecioProducto.getText().toString());
                     total = pr * cant;
                     if (total > 0) {
                         txtPrecioTotal.setVisibility(View.VISIBLE);
@@ -449,10 +447,7 @@ public class ViewProduct extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 double total;
-                TextView txtPrecioTotal = (TextView)findViewById(R.id.txtPrecioTotalView);
-                TextView etPrecioTotal = (TextView)findViewById(R.id.etPrecioTotalView);
-                EditText txtPrecio = (EditText)findViewById(R.id.txtPrecio);
-                EditText txtCant =(EditText)findViewById(R.id.txtCantidad_View);
+
                 if(!txtCant.getText().toString().equals("")) {
                     int cantidad = Integer.parseInt(txtCant.getText().toString());
                     if (!s.toString().equals("") && cantidad > 0) {
@@ -476,14 +471,9 @@ public class ViewProduct extends AppCompatActivity {
 
     }
 
-
-    /**
-     * Si el la versión del movil es 23+ podrá utilizar el escaner de código de barras
-     */
-    @TargetApi(Build.VERSION_CODES.M)
     private void scannerBarCode() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    //    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             IntentIntegrator integrator = new IntentIntegrator(ViewProduct.this);
             integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
             integrator.setPrompt("Scan");
@@ -491,65 +481,45 @@ public class ViewProduct extends AppCompatActivity {
             integrator.setBeepEnabled(false);
             integrator.setBarcodeImageEnabled(false);
             integrator.initiateScan();
-        } else {
+    /*    } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(ViewProduct.this);
             builder.setTitle("Escaner no disponible");
             builder.setMessage("El escaner no esta disponible para su versión de móvil");
-            ImageButton scanBtn = (ImageButton) findViewById(R.id.btBarCode);
             scanBtn.setEnabled(false);
-        }
+        }*/
     }
 
 
     private boolean myRequestStoragePermission(){
 
-    /*    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            return true;
-        }*/
-        if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
-            return true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if((checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                    && (checkSelfPermission(CAMERA)== PackageManager.PERMISSION_GRANTED))
+                btPhot.setEnabled(true);
+                return true;
+        }
 
-        if((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) ||
-                (shouldShowRequestPermissionRationale(CAMERA))){
-            RelativeLayout layout = (RelativeLayout)findViewById(R.id.layout_view_product);
-            Snackbar.make(layout,"Los permisos son necesarios para poder usar la aplicacion",Snackbar.
-                    LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) ||
+                    (shouldShowRequestPermissionRationale(CAMERA))){
+                Snackbar.make(layout,"Los permisos son necesarios para poder usar la aplicacion",Snackbar.
+                        LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener(){
 
-                @TargetApi(Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
-                    requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
-                }
-            });
-        }else{
-            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void onClick(View v) {
+                        requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+                    }
+                });
+            }else{
+                requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,CAMERA},MY_PERMISSIONS);
+            }
         }
         return false;
     }
 
-    /*private File createImageFile() throws IOException{
-        Log.d("MyApp","Llega a createImageFile");
-       // String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName =  p.getCodigo()+"_"+p.getNombre();
-        File storageDir = new File(Environment.getExternalStorageDirectory(), MEDIA_DIRECTORY);
-        Log.d("MyApp","1");
-        File newFile = File.createTempFile(imageFileName, ".jpg", storageDir);
-
-        // Save a file: path for use with ACTION_VIEW intents
-        imagePath = "file:" + newFile.getAbsolutePath();
-        Log.d("MyApp",imagePath);
-        return newFile;
-    }*/
-
     private void takePintureIntent(){
         try {
-        /*    Intent capture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
-            File ruta=  new File(dirImg, txtNameProduct.getText().toString()+".png");
-            imagePath = Uri.fromFile(ruta);
-            capture.putExtra("return-data",true);
-            startActivityForResult(capture,this.PHOTO_CODE);*/
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             intent.putExtra("crop",true);
             intent.putExtra("aspectX",3);
@@ -564,49 +534,8 @@ public class ViewProduct extends AppCompatActivity {
             Toast.makeText(ViewProduct.this, error, Toast.LENGTH_SHORT).show();
         }
 
-        /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Log.d("MyApp","capturar imagen");
-        if(takePictureIntent.resolveActivity(getPackageManager())!=null){
-            File photoFile = null;
-            try{
-                Log.d("MyApp","creamos la imagen");
-                photoFile = createImageFile();
-            }catch (IOException ex){
-                return;
-            }
-            if(photoFile !=null){
-                Log.d("MyApp","la imagen capturada no es nula");
-                Uri photoURI = FileProvider.getUriForFile(ViewProduct.this,
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, PHOTO_CODE);
-            }
-        }*/
+
     }
-
- /*   public Bitmap resizeImage(String ruta){
-        Bitmap imageResize=null;
-        try {
-            Uri imageUri = Uri.parse(ruta);
-            File file = new File(imageUri.getPath());
-            InputStream ims = null;
-
-                ims = new FileInputStream(file);
-
-            Bitmap image = BitmapFactory.decodeStream(ims);
-            Log.d("MyApp", " RESULT PATH "+file.getPath());
-            imagePath= file.getPath();
-            Matrix matrix = new Matrix();
-            matrix.postScale((float)450/image.getWidth(),
-                    (float)450/image.getHeight());
-            imageResize = Bitmap.createBitmap(image,
-                    0, 0, image.getWidth(), image.getHeight(), matrix,true);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return imageResize;
-    }*/
 
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -633,26 +562,28 @@ public class ViewProduct extends AppCompatActivity {
                 //comprobamos si se ha realizado una foto y borramos la imagen anterior
                 if(photo ){
                     //habia una foto anteriormente, eliminamos la anterior
-                    if(!p.getRutaImagen().equals("")){
+                    if(!producto.getImagePath().equals("")){
                         deleteFileImage();
                     }
-                    loadImagePath();
+                    imagePath= loadImagePath();
                 }
                 else{
-                    imagePath=p.getRutaImagen();
+                    imagePath= producto.getImagePath();
                 }
-                Producto px = new Producto(p.getId(), txtNameProduct.getText().toString(),
+                Producto px = new Producto(producto.getId(), txtNameProduct.getText().toString(),
                         Double.parseDouble(txtPrecioProducto.getText().toString()), imagePath,
                         txtScan.getText().toString(),
-                        idCategoria, cant, spinnerUnidad.getSelectedItemPosition());
-                db = mysql.getWritableDatabase();
-                mysql.modProduct(px, db);
+                        idCategoria, spinnerUnidad.getSelectedItemPosition());
+                px.setQuantity(cant);
+                MySQL mysql = MySQL.getInstance(getApplicationContext());
+                SQLiteDatabase db = mysql.getWritableDatabase();
+                mysql.modificarProducto(px, db);
                 Bundle b = getIntent().getExtras();
                 if (b.getSerializable("SuperMercado") != null) {
                     db = mysql.getWritableDatabase();
-                    mysql.modificarSuperMerc_Productos(Integer.toString(px.getCantidad()), "cantidad", px, superMerc, db);
+                    mysql.modificarSuperMerc_Productos(Integer.toString(px.getQuantity()), "cantidad", px, arraySuper.get(spinnerListaCompra.getSelectedItemPosition()), db);
                 }
-                Toast.makeText(ViewProduct.this, px.getNombre()+" modificado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewProduct.this, px.getName()+" modificado", Toast.LENGTH_SHORT).show();
 
                 setResult(RESULT_OK);
                 finish();
@@ -671,11 +602,12 @@ public class ViewProduct extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewProduct.this);
                 builder.setTitle("Eliminar Producto");
                 builder.setMessage("¿Quieres eliminar el producto?");
+
                 builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     boolean b=false;
-                    if(!p.getRutaImagen().equals("")) {
+                    if(!producto.getImagePath().equals("")) {
                         b=deleteFileImage();
                     }
                     else{
@@ -684,13 +616,15 @@ public class ViewProduct extends AppCompatActivity {
                     if(b){
                         if(listBuy){
                             //eliminar de la lista
-                            db = mysql.getWritableDatabase();
-                            mysql.eliminar_Producto_D_SuperMerc_Producto(p.getId(),superMerc.getId(),db);
+                            MySQL mysql = MySQL.getInstance(getApplicationContext());
+                            SQLiteDatabase db = mysql.getWritableDatabase();
+                            mysql.eliminar_Producto_D_SuperMerc_Producto(producto.getId(),arraySuper.get(spinnerListaCompra.getSelectedItemPosition()).getId(),db);
                             setResult(RESULT_OK);
                         }else {
                             EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
-                            db = mysql.getWritableDatabase();
-                            mysql.eliminarProducto(p.getId(), db);
+                            MySQL mysql = MySQL.getInstance(getApplicationContext());
+                            SQLiteDatabase db = mysql.getWritableDatabase();
+                            mysql.eliminarProducto(producto.getId(), db);
                             Toast.makeText(ViewProduct.this, txtNameProduct.getText().toString() + " eliminado",
                                     Toast.LENGTH_SHORT).show();
                             setResult(RESULT_OK);
@@ -726,7 +660,7 @@ public class ViewProduct extends AppCompatActivity {
 
     private boolean deleteFileImage(){
         Boolean b=false;
-        File file = new File(p.getRutaImagen());
+        File file = new File(producto.getImagePath());
         if(file.exists()){
             if(file.delete()){
                 b=true;
@@ -735,22 +669,25 @@ public class ViewProduct extends AppCompatActivity {
         return b;
     }
 
-    private void loadImagePath(){
+    private String loadImagePath(){
+        File ruta=null;
+        String path="";
         try {
             EditText txtNameProduct = (EditText) findViewById(R.id.txtNombre);
             ImageButton btPhot = (ImageButton) findViewById(R.id.imageProd);
             Bitmap bitmap = ((BitmapDrawable) btPhot.getDrawable()).getBitmap();
             File dirImg = new ContextWrapper(getApplicationContext()).getDir("Imagenes", Context.MODE_PRIVATE);
-            File ruta=  new File(dirImg, txtNameProduct.getText().toString()+".png");
+            ruta=  new File(dirImg, txtNameProduct.getText().toString()+".png");
             FileOutputStream out = new FileOutputStream(ruta);
             bitmap.compress(Bitmap.CompressFormat.PNG,10,out);
             out.flush();
-            imagePath=ruta.getAbsolutePath();
+            path= ruta.getAbsolutePath();
 
 
         }catch (Exception e){
             e.printStackTrace();
         }
+        return path;
     }
 
     @Override
@@ -791,21 +728,6 @@ public class ViewProduct extends AppCompatActivity {
             }
         }
     }
-
-   /* public void loadImage(File file){
-        try {
-            InputStream ims = new FileInputStream(file);
-
-            Bitmap image = BitmapFactory.decodeStream(ims);
-            Log.d("MyApp", " RESULT PATH " + file.getPath());
-            imagePath = file.;
-            Bitmap img = BitmapFactory.decodeStream(ims);
-
-            btPhot.setImageBitmap(img);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     @Override
     public void onBackPressed() {

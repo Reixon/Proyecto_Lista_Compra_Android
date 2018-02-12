@@ -12,7 +12,7 @@
         android:layout_height="25dp"
         android:layout_marginLeft="5dp"
         android:layout_weight="1"
-        android:text="categoria"
+        android:text="category"
         android:textSize="14sp"
         android:textStyle="bold" />
 </LinearLayout>
