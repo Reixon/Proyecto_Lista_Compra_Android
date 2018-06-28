@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.reixon.codigodebarras">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.reixon.myshoppingcart">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!--
     <uses-permission
         android:name="android.permission.USE_CREDENTIALS"
         android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS"
+        android:maxSdkVersion="22" />
+    -->
     <uses-permission
         android:name="android.permission.USE_CREDENTIALS"
         android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
     <!-- Permiso para mantener la pantalla encendida -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Permiso para uso de internet -->
@@ -26,18 +32,15 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <!-- Permisos apra autentificacion de cuentas y lectura y escritura mediante sincronizacion de datos -->
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_laucher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -48,28 +51,20 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!--
-            <activity
-            android:name=".activities.Inicio"
-            android:label="@string/title_aplication"
-            android:screenOrientation="portrait"/>
-        -->
         <activity
-            android:name=".ui.Add_product"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.Lista_productos"
+            android:name=".controlador.DespensaActivity"
             android:label="@string/title_activity_stock_product"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.ViewProduct"
+            android:name=".controlador.ConsultarProductoActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.Lista_compra"
-            android:label="@string/title_aplication"
+            android:name=".controlador.ListaCompraActivity"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan">
@@ -80,73 +75,56 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.Admin_list"
+            android:name=".controlador.Admin_list"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.Admin_Category"
+            android:name=".controlador.Admin_Category"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.Admin_account"
+            android:name=".controlador.Admin_account"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.ChooseLog"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.Login"
+            android:name=".controlador.LoginActivity"
             android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.CreateUser"
+            android:name=".controlador.CreateUserActivity"
+            android:label="@string/create_new_account"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.Account_manage"
+            android:name=".controlador.AdminHistorialCompra"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.PreferenciasActivity" />
-
-        <service android:name=".sync.AuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-
-        <!--
-            <provider
-            android:authorities="com.example.reixon.codigodebarras"
-            android:syncable="true"
-            android:exported="true"
-            android:enabled="true"
-            android:name=".sync.ListShopsProvider" />
-
-        <service android:name=".sync.SyncService">
-            <intent-filter>
-                <action android:name="android.accounts.AccounAuthenticator"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-        <service
-            android:name=".sync.SyncService"
-            android:exported="true"
-            android:process=":sync">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-        -->
-
-
+        <activity
+            android:name=".controlador.ConsultarHistorialCompraActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".controlador.Admin_Usuarios_Comparten_Lista"
+            android:label="@string/title_admin_usuarios"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".controlador.AcercaDeActivity"
+            android:label="@string/title_activity_acerca_de"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".controlador.AlmacenActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            android:label="@string/nav_title_admin_almacen"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".controlador.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_settings" />
     </application>
 
 </manifest>

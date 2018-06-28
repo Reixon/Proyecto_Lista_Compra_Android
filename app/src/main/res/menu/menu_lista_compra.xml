@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_syncronize"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/menu_syncronize"
+        app:ifRoom="always" />
+    <item
+        android:id="@+id/menu_share_list"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share_buy_list"
+        app:ifRoom="always" />
+
+    <item
+        android:id="@+id/menu_save_history"
+        android:title="@string/menu_save_history"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_administrar"
+        android:title="@string/nav_title_admin"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/marcarAllProduct"
+                android:title="@string/menu_selectAllProductsShoppingList"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/menu_desmarcarAllProduct"
+                android:title="@string/menu_desmarcarAll"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/menu_deleteAllProductShoppingList"
+                android:title="@string/menu_deleteAll"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+</menu>

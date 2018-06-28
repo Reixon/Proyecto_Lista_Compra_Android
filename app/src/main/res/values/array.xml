@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="language_options">
+        <item>Ingles</item>
+        <item>Español</item>
+    </string-array>
+
+    <string-array name="language_options_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="money_options_value">
+        <item>€</item>
+        <item>$</item>
+        <item>£</item>
+    </string-array>
+
+    <string-array name="money_options_entradas">
+        <item>€</item>
+        <item>$</item>
+        <item>£</item>
+    </string-array>
+
+    <string-array name="dolar_a_moneda">
+        <item>0,8549</item> <!--euros-->
+        <item>0,750999956</item> <!--libras-->
+    </string-array>
+
+    <string-array name="euro_a_moneda">
+        <item>0,87840</item>  <!--libras-->
+        <item>1,16965</item> <!--dolar-->
+    </string-array>
+
+    <string-array name="libras_a_moneda">
+        <item>1,13842</item> <!--euros-->
+        <item>1,331558</item> <!--dolares-->
+    </string-array>
+
+
+    <!---Nombre de productos comunes-->
+    <string-array name="productos_comunes">
+        <item>Aceite</item>
+        <item>Aceitunas</item>
+        <item>Aceitunas negras</item>
+        <item>Aceitunas verdes</item>
+        <item>Agua</item>
+        <item>Agua tonica</item>
+        <item>Aguacate</item>
+        <item>Ajo</item>
+        <item>Albahaca</item>
+        <item>Albaricoque</item>
+        <item>Alcachofa</item>
+        <item>Arroz</item>
+        <item>Atún</item>
+        <item>Atún en lata</item>
+        <item>Azúcar</item>
+        <item>Azúcar moreno</item>
+        <item>Berenjena</item>
+        <item>Bicarbonato</item>
+        <item>Brocoli</item>
+        <item>Café</item>
+        <item>Calabacín</item>
+        <item>Calabaza</item>
+        <item>Canela</item>
+        <item>Carne</item>
+        <item>Carne cangrejo</item>
+        <item>Carne picada</item>
+        <item>Cebollas</item>
+        <item>Cereales</item>
+        <item>Cerezas</item>
+        <item>Cerveza</item>
+        <item>Champán</item>
+        <item>Champiñones</item>
+        <item>Chocolate</item>
+        <item>Chorizo</item>
+        <item>Chuletas de cerdo</item>
+        <item>Chuletas de ternera</item>
+        <item>Ciruela</item>
+        <item>Coco</item>
+        <item>Coliflor</item>
+        <item>Comida para animales</item>
+        <item>Contramuslo de pollo</item>
+        <item>Costillas de cerdo</item>
+        <item>Cruasanes</item>
+        <item>Donut</item>
+        <item>Embutido</item>
+        <item>Espinacas</item>
+        <item>Extrato de tomate</item>
+        <item>Filetes</item>
+        <item>Filetes de lomo</item>
+        <item>Fresas</item>
+        <item>Frutos secos</item>
+        <item>Galletas</item>
+        <item>Gambas</item>
+        <item>Gelatina</item>
+        <item>Gofres</item>
+        <item>Golosinas</item>
+        <item>Guindilla</item>
+        <item>Guisantes</item>
+        <item>Harina de avena</item>
+        <item>Harina de maíz</item>
+        <item>Harina de trigo</item>
+        <item>Helado</item>
+        <item>Huevos</item>
+        <item>Jamón curado</item>
+        <item>Jamón fresco</item>
+        <item>Judías</item>
+        <item>Ketchup</item>
+        <item>Leche</item>
+        <item>Leche condensada</item>
+        <item>Leche de soja</item>
+        <item>Leche en polvo</item>
+        <item>Lechuga</item>
+        <item>Lentejas</item>
+        <item>Levadura</item>
+        <item>Levadura en polvo</item>
+        <item>Levadura quimica</item>
+        <item>Licor</item>
+        <item>Limón</item>
+        <item>Lima</item>
+        <item>Macarrones</item>
+        <item>Maiz</item>
+        <item>Manteca de cacahuete</item>
+        <item>Mantequilla</item>
+        <item>Manzanas</item>
+        <item>Margarina</item>
+        <item>Mayonesa</item>
+        <item>Melocotones</item>
+        <item>Melocotones en almíbar</item>
+        <item>Melón</item>
+        <item>Miel</item>
+        <item>Mostaza</item>
+        <item>Mozzarella</item>
+        <item>Muesli</item>
+        <item>Naranjas</item>
+        <item>Nata</item>
+        <item>Nectarinas</item>
+        <item>Nueces</item>
+        <item>Oregano</item>
+        <item>Palomitas de maíz</item>
+        <item>Pan</item>
+        <item>Pan de hamburguesas</item>
+        <item>Pan rallado</item>
+        <item>Panceta</item>
+        <item>Papel de aluminio</item>
+        <item>Papel higiénico</item>
+        <item>Parmesano</item>
+        <item>Pasas</item>
+        <item>Pastilla de caldo de carne</item>
+        <item>Patatas</item>
+        <item>Patatas rojas</item>
+        <item>Patatas fritas</item>
+        <item>Pavo</item>
+        <item>Pechuga de pavo</item>
+        <item>Pechuga de pollo</item>
+        <item>Pepinos</item>
+        <item>Peras</item>
+        <item>Perejil</item>
+        <item>Pescado</item>
+        <item>Pilas</item>
+        <item>Pimenton</item>
+        <item>Pimienta</item>
+        <item>Pimienta negra</item>
+        <item>Pimientos</item>
+        <item>Piña dulce</item>
+        <item>Piña en almíbar</item>
+        <item>Pizza congelada</item>
+        <item>Platano</item>
+        <item>Pollo</item>
+        <item>Pomelos</item>
+        <item>Queso</item>
+        <item>Queso fresco</item>
+        <item>Queso mozzarella</item>
+        <item>Queso para untar</item>
+        <item>Queso rallado</item>
+        <item>Queso suizo</item>
+        <item>Rabano picante</item>
+        <item>Rabanos</item>
+        <item>Refrescos</item>
+        <item>Remolacha</item>
+        <item>Repollo</item>
+        <item>Ron</item>
+        <item>Rosbif</item>
+        <item>Rúcula</item>
+        <item>Sabana</item>
+        <item>Sake</item>
+        <item>Sal</item>
+        <item>Sal condimentada</item>
+        <item>Sal gruesa</item>
+        <item>Sal refinada</item>
+        <item>Salami</item>
+        <item>Salchicha de Bolonia</item>
+        <item>Salchica de cerdo portuguesa</item>
+        <item>Salchicas</item>
+        <item>Salchicas de Calabria</item>
+        <item>Salchicas portuguesas</item>
+        <item>Salmón</item>
+        <item>Salsa agridulce</item>
+        <item>Salsa de soja</item>
+        <item>Salsa de tomate</item>
+        <item>Sandía</item>
+        <item>Sardinas</item>
+        <item>Sardinas en lata</item>
+        <item>Servilletas de papel</item>
+        <item>Solomillo</item>
+        <item>Sopa en polvo</item>
+        <item>Suavizante</item>
+        <item>Tabla de queso</item>
+        <item>Tarta de queso</item>
+        <item>Té</item>
+        <item>Té negro</item>
+        <item>Té preparado para beber</item>
+        <item>Té verde</item>
+        <item>Tofu</item>
+        <item>Tomate</item>
+        <item>Tortilla</item>
+        <item>Tortitas</item>
+        <item>Uvas</item>
+        <item>Verduras</item>
+        <item>Verduas de hoja verde para ensalada</item>
+        <item>Vinagre</item>
+        <item>Vino blanco</item>
+        <item>Vino tinto</item>
+        <item>Vodka</item>
+        <item>Whisky</item>
+        <item>Yogures</item>
+        <item>Zanahorias</item>
+        <item>Zumo</item>
+        <item>Zumo de frutas</item>
+        <item>Zumo de naranja</item>
+    </string-array>
+
+</resources>

@@ -2,14 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/EtBorrar_producto"
+        android:id="@+id/menu_delete"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="@string/Borrar_Producto"
-        app:showAsAction="ifRoom" />
+        android:title="@string/menu_borrar_producto"
+        app:ifRoom="always" />
     <item
-        android:id="@+id/checkAll"
-        android:icon="@drawable/icon_check_on"
-        android:title="@string/CheckAll"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/menu_copiar"
+        android:icon="?attr/actionModeCopyDrawable"
+        android:title="@string/menu_copiar_producto"
+        app:ifRoom="always" />
+
+    <item
+        android:id="@+id/marcarAllProduct"
+        android:title="@string/menu_selectAllProductsShoppingList"
+        app:showAsAction="never" />
 
 </menu>

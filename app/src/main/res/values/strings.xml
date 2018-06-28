@@ -1,23 +1,23 @@
 <resources>
-    <string name="app_name">TFG - Lista de compra</string>
+    <string name="app_name">My Shopi Cart</string>
     <string name="action_settings">Setting</string>
     <string name="btnScan">Scan</string>
-    <string name="txtbtnQRcode">Lector de QR Code</string>
     <string name="txtbtnBarcode">Lector de Código de Barra</string>
-    <string name="title_aplication">Codigo de Barras</string>
-    <string name="title_activity_stock_product">stock_product</string>
-    <string name="title_activity_main_menu_activity">main_menu_activity</string>
-
-    <string name="section_format">Hello World from section: %1$d</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="bt_finalizar_compra">Finalizar Compra</string>
     <string name="buttonAdminList">Crear lista</string>
     <string name="buttonAddCategoryAdmin">Crear Categoria</string>
     <string name="etPrecioTotal">Precio Total: </string>
-    <string name="etNumPro">Número elementos: </string>
+    <string name="etNumProT">Total: </string>
+    <string name="etPrecioCarrito">Precio Carrito: </string>
+    <string name="etNumProCarrito">Carrito: </string>
     <string name="etAnyadir">Añadir</string>
-    <string name="etEuro"> € </string>
+    <string name="etMoney"> € </string>
     <string name="descriptionBtOk">Añadir producto</string>
     <string name="descriptionPhotoBt">Photo Button</string>
+    <string name="name_carrito">Carrito</string>
+
+    <!--Despensa-->
+    <string name="title_activity_stock_product">Despensa</string>
 
     <!--View Product-->
     <string name="etName">Introduce el name del producto</string>
@@ -32,31 +32,103 @@
     <!--menu_product-->
     <string name="Aceptar">Aceptar</string>
     <string name="Borrar">Borrar</string>
+    <string name="Cancelar">Cancelar</string>
+
+    <!--permissions-->
+    <string name="explication_permissions">La aplicación necesita los
+        permiso de poder realizar fotografias a productos y
+        poder almacenarlas en la memoria extraible</string>
 
     <!--menu buy list-->
     <string name="menu_share_buy_list">Compartir</string>
     <string name="menu_save_history">Guardar historial</string>
     <string name="menu_syncronize">Sincronizar</string>
-    <string name="menu_addShare">Añadir Contacto</string>
+    <string name="menu_selectAllProductsShoppingList">Marcar todos </string>
+    <string name="menu_desmarcarAll">Desmarcar todos </string>
+    <string name="menu_anyadirAlmacen">Añadir Productos al Almacen</string>
+    <string name="menu_deleteAll">Eliminar todos los productos</string>
 
-    <!--menu list prod -->
-    <string name="Borrar_Producto">Borrar Producto</string>
-    <string name="CheckAll">CheckAll</string>
+    <!--mDespensaacen -->
+    <string name="menu_borrar_producto">Borrar Producto</string>
+    <string name="menu_copiar_producto">Copiar Producto</string>
 
-    <!--menu Navigation-->
+    <!--ACTIVITY LOGIN-->
+    <string name="title_activity_login">Iniciar sesión</string>
+
+    <!--CREATE HISTORIAL-->
+    <string name="hint_name_historial">Introduce el lugar de la compra</string>
+    <string name="et_fecha_compra">Fecha de compra: </string>
+    <string name="et_importe_compra_historial">Importe total de la compra: </string>
+
+    <!--Cambiar contraseña-->
+    <string name="change_password_action_change">Cambiar contraseña</string>
+    <string name="change_password_new_password">Nueva Contraseña</string>
+
+    <!--Elegir Log o Crear-->
+    <string name="create_new_account">Crear nueva cuenta</string>
+    <string name="login_account">Iniciar cuenta</string>
+
+    <!--Crear cuenta-->
+    <string name="add_create_new_account">Añadir nueva cuenta</string>
+
+    <!-- Strings related to login AND create-->
+    <string name="prompt_user">Nombre</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Contraseña</string>
+
+    <string name="action_sign_in">CREAR CUENTA</string>
+    <string name="action_sign_in_short">INICIAR</string>
+    <string name="error_this_email_is_add">Esta cuenta ya esta agregada</string>
+    <string name="error_invalid_email">Este email es invalido</string>
+    <string name="error_this_account_not_exist">Esta cuenta no existe</string>
+    <string name="error_this_account_exist">La dirección de correo indicada ya ha sido utilizada en otra cuenta</string>
+    <string name="error_invalid_password">Contraseña demasiado corta</string>
+    <string name="error_incorrect_password">Contraseña incorrecta</string>
+    <string name="error_field_required">Campo requerido</string>
+
+    <!--Navigate-->
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <!-- NAVIGATE DRAWER-->
+    <string name="title_activity_menu_navigate">menu_navigate</string>
+    <string name="navigation_drawer_user_name">Usuario</string>
+    <string name="navigation_drawer_user_email">Email</string>
+    <string name="navigation_drawer_context_description">Imagen de cuenta de principal</string>
+    <string name="nav_title_admin_lista">Listas</string>
+    <string name="nav_title_admin_despensa">Despensa</string>
+    <string name="nav_title_admin_almacen">Productos</string>
+    <string name="nav_title_admin_categorias">Categorias</string>
+    <string name="nav_title_admin_historialCompras">Historial Compras</string>
+    <string name="nav_title_admin">Administrar</string>
+    <string name="title_activity_navigation_drawer">NavigationDrawer</string>
 
-    <!---->
-    <string name="sync_account_type">com.example.reixon.codigodebarras</string>
-    <string name="content_authority">com.example.android.codigodebarras.app</string>
+    <!--Preferencias Idioma-->
+    <string name="titlleChoseLanguage">Elegir Idioma</string>
+    <string name="summaryChoseLanguage">Elige el idoma para la aplicación</string>
+    <string name="language_options_default_values">1</string>
+
+    <!--Historial Compras View -->
+    <string name="Ubicacion">Ubicación:</string>
+    <string name="Fecha">Fecha:</string>
+    <string name="NombreProdHC">Nombre</string>
+    <string name="CantidadHC">Cantidad</string>
+    <string name="PrecioHC">Precio</string>
+    <string name="Importe_total">Improte total:</string>
+    <string name="title_activity_acerca_de">AcercaDeActivity</string>
+    <string name="title_activity_settings">Ajustes</string>
+
+    <!--usuarios con los que has compartido la lista-->
+    <string name="title_admin_usuarios">Compartir</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
+    <string name="title_activity_login_2">Login</string>
+    <string name="permission_rationale">Contacts permissions are needed for providing email
+        completions.</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <!-- <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact
         based on your message history
     </string>
@@ -74,10 +146,10 @@
         <item>1</item>
         <item>0</item>
         <item>-1</item>
-    </string-array>
+    </string-array>-->
 
     <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <!--  <string name="pref_header_data_sync">Data &amp; sync</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
@@ -111,57 +183,17 @@
 
     <string-array name="multi_select_list_preference_default_value" />
 
-    <string name="pref_title_system_sync_settings">System sync settings</string>
+    <string name="pref_title_system_sync_settings">System sync settings</string>-->
 
     <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
+    <!--  <string name="pref_header_notifications">Notifications</string>
 
     <string name="pref_title_new_message_notifications">New message notifications</string>
 
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
 
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_login">Iniciar sesión</string>
-
-
-    <!--Cambiar contraseña-->
-    <string name="change_password_action_change">Cambiar contraseña</string>
-    <string name="change_password_new_password">Nueva Contraseña</string>
-
-    <!--Elegir Log o Crear-->
-    <string name="create_new_account">Crear nueva cuenta</string>
-    <string name="login_account">Iniciar cuenta</string>
-
-    <!--Crear cuenta-->
-    <string name="add_create_new_account">Añadir nueva cuenta</string>
-
-    <!-- Strings related to login AND create-->
-    <string name="prompt_user">Nombre</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Contraseña</string>
-
-    <string name="action_sign_in">CREAR CUENTA</string>
-    <string name="action_sign_in_short">INICIAR</string>
-    <string name="error_this_email_is_add">Esta cuenta ya esta agregada</string>
-    <string name="error_invalid_email">Este email es invalido</string>
-    <string name="error_this_account_not_exist">Esta cuenta no existe</string>
-    <string name="error_this_account_exist">La dirección de correo indicada ya ha sido utilizada en otra cuenta</string>
-    <string name="error_invalid_password">Contraseña demasiado corta</string>
-    <string name="error_incorrect_password">Contraseña incorrecta</string>
-    <string name="error_field_required">Campo requerido</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-
-    <!-- NAVIGATE DRAWER-->
-    <string name="title_activity_menu_navigate">menu_navigate</string>
-    <string name="navigation_drawer_user_name">Usuario</string>
-    <string name="navigation_drawer_user_email">Email</string>
-    <string name="navigation_drawer_context_description">Imagen de cuenta de usuario</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="title_activity_navigation_drawer">NavigationDrawer</string>
+    <string name="pref_title_vibrate">Vibrate</string>-->
 
 
 </resources>
