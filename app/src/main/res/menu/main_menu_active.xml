@@ -5,16 +5,18 @@
         android:id="@+id/menu_delete"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/menu_borrar_producto"
-        app:ifRoom="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_copiar"
         android:icon="?attr/actionModeCopyDrawable"
         android:title="@string/menu_copiar_producto"
-        app:ifRoom="always" />
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/marcarAllProduct"
+        android:id="@+id/selecionarTodos"
+        android:icon="@drawable/icon_check_on"
+
         android:title="@string/menu_selectAllProductsShoppingList"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

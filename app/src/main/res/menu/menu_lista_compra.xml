@@ -5,12 +5,17 @@
         android:id="@+id/menu_syncronize"
         android:icon="@android:drawable/stat_notify_sync"
         android:title="@string/menu_syncronize"
-        app:ifRoom="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_share_list"
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/menu_share_buy_list"
-        app:ifRoom="always" />
+        app:showAsAction="ifRoom" />
+   <!-- <item
+        android:id="@+id/menu_adminCategoria"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share_buy_list"
+        app:showAsAction="never" />-->
 
     <item
         android:id="@+id/menu_save_history"
