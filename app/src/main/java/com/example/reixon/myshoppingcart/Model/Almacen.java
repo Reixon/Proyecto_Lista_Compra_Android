@@ -15,6 +15,7 @@ public class Almacen implements Serializable {
     private ArrayList<Producto> productosTotales;
     private ArrayList<String> categorias;
     private boolean[][]itemsChecks;
+    private int tamChecks;
 
     public Almacen(){
         productosTotales = new ArrayList<Producto>();
@@ -73,7 +74,7 @@ public class Almacen implements Serializable {
         itemsChecks = new boolean[categorias.size()][maxProductosCategoria];
         return productosTotalesAlmacen;
     }*/
-   public SortedMap<String, List> getProductosPorCategoria(){
+   public SortedMap<String, List> getProductosCategoria(){
        SortedMap<String, List> productosAlmacen= new TreeMap<>();
        categorias = new ArrayList<>();
        List productosT = new ArrayList<>();
@@ -88,7 +89,7 @@ public class Almacen implements Serializable {
            datos = productosTotales.get(i).toString();
            datosP = datos.split(",;");
            nombreC = datosP[4];
-           //  productos.get(i).setPosicionListaCompra(i);
+           //    productosDespensa.get(i).setPosProductoListaCompra(i);
            if(categorias.contains(nombreC)){
                productosT.add(productosTotales.get(i));
            }else{
@@ -117,17 +118,50 @@ public class Almacen implements Serializable {
        return productosAlmacen;
    }
 
+    public boolean getProductoCheck(int posCat, int pos){
+        return  itemsChecks[posCat][pos];
+    }
 
-    public boolean[][] getProductosChecks(){
-        return itemsChecks;
+    public int getTamChecks(){
+        return tamChecks;
     }
 
     public void setProductosChecks(boolean[][] items){
         itemsChecks= items;
     }
 
+    public int getSizeProducts(){
+        return productosTotales.size();
+    }
+
+    public void setProductoCheck(int posCat, int pos){
+        itemsChecks[posCat][pos]=true;
+        tamChecks++;
+    }
+
+    public void setProductoCheckOut(int posCat, int pos){
+        itemsChecks[posCat][pos]=false;
+        if(tamChecks>0)
+            tamChecks--;
+    }
+
+    public boolean isAllProductsSelected(){
+        if(productosTotales.size()==this.tamChecks){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean[][] getProductosChecks(){
+        return itemsChecks;
+    }
+
     public ArrayList<String> getCategoriasListaCompra(){
         return categorias;
+    }
+
+    public int getTamProductos(){
+        return productosTotales.size();
     }
 }
 

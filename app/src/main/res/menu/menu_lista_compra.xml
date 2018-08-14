@@ -11,17 +11,6 @@
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/menu_share_buy_list"
         app:showAsAction="ifRoom" />
-   <!-- <item
-        android:id="@+id/menu_adminCategoria"
-        android:icon="@android:drawable/ic_menu_share"
-        android:title="@string/menu_share_buy_list"
-        app:showAsAction="never" />-->
-
-    <item
-        android:id="@+id/menu_save_history"
-        android:title="@string/menu_save_history"
-        app:showAsAction="never" />
-
     <item
         android:id="@+id/menu_administrar"
         android:title="@string/nav_title_admin"
@@ -35,10 +24,10 @@
                 android:id="@+id/menu_desmarcarAllProduct"
                 android:title="@string/menu_desmarcarAll"
                 app:showAsAction="never" />
-            <item
-                android:id="@+id/menu_deleteAllProductShoppingList"
+        <!--    <item
+                android:id="@+id/menu_deleteAllProduct"
                 android:title="@string/menu_deleteAll"
-                app:showAsAction="never" />
+                app:showAsAction="never" />-->
         </menu>
     </item>
 
