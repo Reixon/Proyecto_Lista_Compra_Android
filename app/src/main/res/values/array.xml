@@ -105,12 +105,10 @@
         <item>Peras</item>
         <item>Perejil</item>
         <item>Pimientos</item>
-        <item>Piña dulce</item>
-        <item>Piña en almíbar</item>
+        <item>Piña</item>
         <item>Platano</item>
         <item>Pomelos</item>
         <item>Puerro</item>
-        <item>Rábano picante</item>
         <item>Rábanos</item>
         <item>Remolacha</item>
         <item>Repollo</item>
@@ -130,24 +128,16 @@
         <item>Baguette</item>
         <item>Barra de pan</item>
         <item>Bollos</item>
-        <item>Croissant</item>
         <item>Cruasanes</item>
         <item>Donuts</item>
         <item>Empanadas</item>
         <item>Hojaldre</item>
         <item>Magdalenas</item>
-        <item>Masa para pizza</item>
-        <item>Mezcla para tortitas</item>
-        <item>Pan</item>
         <item>Pan de hamburguesas</item>
-        <item>Tarta</item>
         <item>Tortitas</item>
         <item>Tostada</item>
         <!--Leche y queso-->
-        <item>Leche y queso</item>
-        <item>Crema</item>
-        <item>Crema agria</item>
-        <item>Crema fresca</item>
+        <item>Leche y Queso</item>
         <item>Gorgonzola</item>
         <item>Huevos</item>
         <item>Leche</item>
@@ -165,16 +155,11 @@
         <item>Queso mozzarella</item>
         <item>Queso Parmesano</item>
         <item>Queso para untar</item>
-        <item>Queso rallado</item>
-        <item>Queso suizo</item>
-        <item>Queso crema</item>
-        <item>Requesón</item>
         <item>Yogur</item>
         <!--Carne y pescado-->
         <item>Carne y Pescado</item>
         <item>Anchoas</item>
         <item>Atún</item>
-        <item>Atún en lata</item>
         <item>Bacón</item>
         <item>Bratwurst</item>
         <item>Carne</item>
@@ -188,14 +173,12 @@
         <item>Embutidos</item>
         <item>Fiambres</item>
         <item>Filetes</item>
-        <item>Filetes de lomo</item>
-        <item>Filetes de vaca</item>
         <item>Gambas</item>
         <item>Jamón curado</item>
         <item>Jamón fresco</item>
         <item>Langosta</item>
         <item>Mejillones</item>
-        <item>Otras</item>
+        <item>Ostras</item>
         <item>Pavo</item>
         <item>Pechuga de pavo</item>
         <item>Pechuga de pollo</item>
@@ -203,33 +186,23 @@
         <item>Pescado</item>
         <item>Pollo</item>
         <item>Salami</item>
-        <item>Salchicha de Bolonia</item>
-        <item>Salchica de cerdo portuguesa</item>
         <item>Salchichas</item>
-        <item>Salchicas de Calabria</item>
-        <item>Salchicas portuguesas</item>
+        <item>Salchichas portuguesas</item>
         <item>Salmón</item>
         <item>Ternera</item>
         <!--Ingredientes y especias-->
         <item>Ingredientes y Especias</item>
         <item>Aceite</item>
-        <item>Aliñó para ensalada</item>
         <item>Almendras</item>
         <item>Avellanas</item>
         <item>Azúcar</item>
-        <item>Azúcar glasé</item>
-        <item>Azúcar moreno</item>
-        <item>Azúcar vainillado</item>
         <item>Bicarbonato</item>
         <item>Caldo</item>
         <item>Canela</item>
-        <item>Escurtido</item>
         <item>Frijoles</item>
         <item>Ketchup</item>
         <item>Lentejas</item>
         <item>Levadura</item>
-        <item>Levadura en polvo</item>
-        <item>Levadura quimica</item>
         <item>Mantequilla de cacahuete</item>
         <item>Mayonesa</item>
         <item>Mostaza</item>
@@ -237,22 +210,15 @@
         <item>Oregano</item>
         <item>Pan rallado</item>
         <item>Pimienta</item>
-        <item>Pimienta negra</item>
         <item>Piñones</item>
         <item>Pure de tomate</item>
         <item>Romero</item>
         <item>Sal</item>
-        <item>Sal condimentada</item>
         <item>Sal gruesa</item>
-        <item>Sal refinada</item>
         <item>Salsa</item>
         <item>Salsa agridulce</item>
         <item>Salsa de soja</item>
-        <item>Salsa de tomate</item>
-        <item>Tomate frito</item>
-        <item>Tomates en lata</item>
         <item>Vinagre</item>
-        <item>Vinagre balsámico</item>
         <!--CONGELADOS Y CONVENIENCIA-->
         <item>Congelados y Conveniencia</item>
         <item>Alitas De Pollo</item>
@@ -262,13 +228,12 @@
         <item>Comida italiana</item>
         <item>Comida mexicana</item>
         <item>Comida tailandesa</item>
-        <item>Conquetas</item>
+        <item>Croquetas</item>
         <item>Helado</item>
         <item>Lasaña</item>
         <item>Palitos de pescado</item>
         <item>Patatas fritas</item>
         <item>Pizza</item>
-        <item>Sopa</item>
         <item>Verduras Congeladas</item>
         <!--Cereales y pasta-->
         <item>Cereales y Pasta</item>
@@ -282,53 +247,42 @@
         <item>Harina de maíz</item>
         <item>Harina de trigo</item>
         <item>Muesli</item>
-        <item>Pasta</item>
         <item>Penne</item>
         <item>Sémola</item>
         <item>Tofu</item>
 
         <item>Aperitivos y Dulces</item>
-        <item>Aperitivos</item>
-        <item>Barrita de cereales</item>
         <item>Cacahuetes</item>
         <item>Chicle</item>
         <item>Chocolate</item>
-        <item>Crema de cacao</item>
         <item>Dulces</item>
         <item>Frutos secos</item>
         <item>Galletas</item>
         <item>Gelatina</item>
         <item>Gofres</item>
-        <item>Golosinas</item>
         <item>Miel</item>
         <item>Nachos</item>
         <item>Natillas</item>
         <item>Palomitas de maíz</item>
+        <item>Tarta</item>
 
-        <item>Bebidas y Tabaco</item>
+        <item>Bebidas</item>
         <item>Agua</item>
         <item>Agua tonica</item>
         <item>Bebida isotónica</item>
-        <item>Bebidas</item>
         <item>Café</item>
         <item>Cerveza</item>
         <item>Champán</item>
         <item>Cola</item>
-        <item>Cola Light</item>
         <item>Licor</item>
         <item>Ron</item>
         <item>Sidra</item>
         <item>Té</item>
-        <item>Té negro</item>
-        <item>Té preparado para beber</item>
-        <item>Té verde</item>
         <item>Vino blanco</item>
         <item>Vino tinto</item>
         <item>Vodka</item>
         <item>Whisky</item>
         <item>Zumo</item>
-        <item>Zumo de frutas</item>
-        <item>Zumo de naranja</item>
 
     </string-array>
 

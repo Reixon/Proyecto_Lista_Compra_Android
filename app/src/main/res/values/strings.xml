@@ -19,6 +19,7 @@
     <!--Despensa-->
     <string name="title_activity_stock_product">Despensa</string>
     <string name="btSalirDespensaOnline">Salir de esta despensa</string>
+    <string name="total_productos">Productos totales:</string>
 
 
     <!--View Product-->
@@ -112,7 +113,7 @@
     <string name="language_options_default_values">1</string>
 
     <!--Historial Compras View -->
-    <string name="Ubicacion">Ubicación:</string>
+    <string name="Ubicacion">Nombre:</string>
     <string name="Fecha">Fecha:</string>
     <string name="NombreProdHC">Nombre</string>
     <string name="CantidadHC">Cantidad</string>

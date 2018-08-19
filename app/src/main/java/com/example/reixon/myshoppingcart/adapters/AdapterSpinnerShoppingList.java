@@ -56,20 +56,20 @@ public class AdapterSpinnerShoppingList extends ArrayAdapter {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.spinner_style_online,parent,false);
             holder.name = (TextView) convertView.findViewById(R.id.txt_name_spinner);
-            holder.imagen = (ImageView) convertView.findViewById(R.id.icon_online_spinner);
+        //    holder.imagen = (ImageView) convertView.findViewById(R.id.icon_online_spinner);
             convertView.setTag(holder);
         }
         else{
             holder = (ViewHolder) convertView.getTag();
         }
         holder.name.setText(listasCompra.get(position));
-        holder.imagen.setImageResource(R.drawable.ic_online);
-        if(principal.isListaOnline(position)){
+    //    holder.imagen.setImageResource(R.drawable.ic_online);
+     /*   if(principal.isListaOnline(position)){
             holder.imagen.setVisibility(View.VISIBLE);
         }
         else{
             holder.imagen.setVisibility(View.GONE);
-        }
+        }*/
         return convertView;
     }
 }

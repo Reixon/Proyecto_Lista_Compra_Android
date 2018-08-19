@@ -1,5 +1,9 @@
 package com.example.reixon.myshoppingcart.Model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,6 +166,21 @@ public class Almacen implements Serializable {
 
     public int getTamProductos(){
         return productosTotales.size();
+    }
+
+    public boolean isCheck(int posC, int posP){
+        return itemsChecks[posC][posP];
+    }
+
+    public JSONArray convertirProductosSeleccionadosJSON(ArrayList<Producto> ps) throws JSONException {
+        JSONArray arrayProducts = new JSONArray();
+        JSONObject product;
+        for (int i = 0; i < ps.size(); i++) {
+            product = ps.get(i).convertirJSONProducto();
+            product.put("comprado",false);
+            arrayProducts.put(product);
+        }
+        return arrayProducts;
     }
 }
 

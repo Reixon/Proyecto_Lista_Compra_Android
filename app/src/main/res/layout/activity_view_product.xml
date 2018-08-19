@@ -49,12 +49,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <EditText
                     android:id="@+id/txtNombreProd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
                     android:text="NombreProducto"
+                    android:textColor="@android:color/background_dark"
                     android:textSize="18sp" />
             </LinearLayout>
 

@@ -60,6 +60,7 @@
             android:name=".controlador.ConsultarProductoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
+            android:label=""
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".controlador.ListaCompraActivity"
@@ -102,6 +103,7 @@
         <activity
             android:name=".controlador.ConsultarHistorialCompraActivity"
             android:screenOrientation="portrait"
+            android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".controlador.Admin_Usuarios_Comparten_ListaActivity"
